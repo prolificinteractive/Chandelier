@@ -35,8 +35,6 @@ public class SwipeActionLayout extends ViewGroup
   private static final int INVALID_POINTER = -1;
   private static final float DRAG_RATE = .8f;
 
-  private static final int TRANSLATE_UP_DURATION = 150;
-
   private static final int ALPHA_ANIMATION_DURATION = 300;
 
   private static final int ANIMATE_TO_START_DURATION = 300;
@@ -46,10 +44,10 @@ public class SwipeActionLayout extends ViewGroup
 
   private final AttributeSet mAttrs;
 
+  private boolean mActionSelected;
   private View mAbsListView;
   private View mTarget; // the target of the gesture
   private OnActionListener mListener;
-  private boolean mRefreshing = false;
   private int mTouchSlop;
   private float mTotalDragDistance = -1;
   // If nested scrolling is enabled, the total amount that needed to be
@@ -77,6 +75,23 @@ public class SwipeActionLayout extends ViewGroup
       android.R.attr.enabled
   };
 
+  private final AnimationListener mMoveToStartListener = new AnimationListener() {
+    @Override public void onAnimationStart(Animation animation) {
+
+    }
+
+    @Override public void onAnimationEnd(Animation animation) {
+      if (mActionSelected) {
+        mListener.onActionSelected(mActionLayout.getSelectedIndex());
+        mActionSelected = false;
+      }
+    }
+
+    @Override public void onAnimationRepeat(Animation animation) {
+
+    }
+  };
+
   private ActionLayout mActionLayout;
 
   protected int mFrom;
@@ -90,30 +105,6 @@ public class SwipeActionLayout extends ViewGroup
   private float mSpinnerFinalOffset;
 
   private int mAlpha;
-
-  private Animation.AnimationListener mRefreshListener = new Animation.AnimationListener() {
-    @Override
-    public void onAnimationStart(Animation animation) {
-    }
-
-    @Override
-    public void onAnimationRepeat(Animation animation) {
-    }
-
-    @Override
-    public void onAnimationEnd(Animation animation) {
-      mListener.onActionSelected(mActionLayout.getSelectedIndex());
-      mActionLayout.setVisibility(View.GONE);
-      setColorViewAlpha(MAX_ALPHA);
-      // Return the circle to its start position
-      setTargetOffsetTopAndBottom(mOriginalOffsetTop - mCurrentTargetOffsetTop);
-      mCurrentTargetOffsetTop = mActionLayout.getTop();
-    }
-  };
-
-  private void setColorViewAlpha(int targetAlpha) {
-    mActionLayout.setAlpha(targetAlpha);
-  }
 
   /**
    * Simple constructor to use when creating a SwipeRefreshLayout from code.
@@ -164,30 +155,6 @@ public class SwipeActionLayout extends ViewGroup
    */
   public void setOnActionSelectedListener(OnActionListener listener) {
     mListener = listener;
-  }
-
-  private void setAnimationProgress(float progress) {
-    ViewCompat.setTranslationY(mActionLayout, -progress * mActionLayout.getHeight());
-  }
-
-  private void startTranslateUpAnimation(Animation.AnimationListener listener) {
-    Log.d("ME", "startTranslateUpAnimation");
-    ensureTarget();
-    final Animation mTranslateUpAnimation = new Animation() {
-      @Override
-      public void applyTransformation(float interpolatedTime, Transformation t) {
-        setAnimationProgress(interpolatedTime);
-      }
-    };
-    mTranslateUpAnimation.setDuration(TRANSLATE_UP_DURATION);
-    mActionLayout.setAnimationListener(listener);
-    mActionLayout.clearAnimation();
-    mActionLayout.startAnimation(mTranslateUpAnimation);
-    //mAbsListView.clearAnimation();
-    //mAbsListView.animate()
-    //    .translationY(0)
-    //    .setInterpolator(new AccelerateDecelerateInterpolator())
-    //    .start();
   }
 
   private void startProgressAlphaStartAnimation() {
@@ -329,7 +296,7 @@ public class SwipeActionLayout extends ViewGroup
       mReturningToStart = false;
     }
 
-    if (!isEnabled() || mReturningToStart || canChildScrollUp() || mRefreshing) {
+    if (!isEnabled() || mReturningToStart || canChildScrollUp()) {
       // Fail fast if we're not in a state where a swipe is possible
       return false;
     }
@@ -428,7 +395,7 @@ public class SwipeActionLayout extends ViewGroup
         mTotalUnconsumed -= dy;
         consumed[1] = dy;
       }
-      moveSpinner(mTotalUnconsumed);
+      moveActionLayout(mTotalUnconsumed);
     }
 
     // Now let our nested parent consume the leftovers
@@ -463,7 +430,7 @@ public class SwipeActionLayout extends ViewGroup
     if (dyUnconsumed < 0) {
       dyUnconsumed = Math.abs(dyUnconsumed);
       mTotalUnconsumed += dyUnconsumed;
-      moveSpinner(mTotalUnconsumed);
+      moveActionLayout(mTotalUnconsumed);
     }
     // Dispatch up to the nested parent
     dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dxConsumed, null);
@@ -532,13 +499,10 @@ public class SwipeActionLayout extends ViewGroup
     return animation != null && animation.hasStarted() && !animation.hasEnded();
   }
 
-  private void moveSpinner(float overscrollTop) {
+  private void moveActionLayout(final float overscrollTop) {
     float originalDragPercent = overscrollTop / mTotalDragDistance;
-
     float dragPercent = Math.min(1f, Math.abs(originalDragPercent));
-
-    int targetY = mOriginalOffsetTop + (int) (mSpinnerFinalOffset * dragPercent);
-    // where 1.0f is a full circle
+    final int targetY = mOriginalOffsetTop + (int) (mSpinnerFinalOffset * dragPercent);
     if (mActionLayout.getVisibility() != View.VISIBLE) {
       mActionLayout.setVisibility(View.VISIBLE);
     }
@@ -556,24 +520,9 @@ public class SwipeActionLayout extends ViewGroup
     setTargetOffsetTopAndBottom(targetY - mCurrentTargetOffsetTop);
   }
 
-  private void finishSpinner(float overscrollTop) {
-    Log.d("ME", "overscrollTop: " + overscrollTop);
-    Animation.AnimationListener listener = new Animation.AnimationListener() {
-
-      @Override
-      public void onAnimationStart(Animation animation) {
-      }
-
-      @Override
-      public void onAnimationEnd(Animation animation) {
-        //startTranslateUpAnimation(null);
-      }
-
-      @Override
-      public void onAnimationRepeat(Animation animation) {
-      }
-    };
-    animateOffsetToStartPosition(Math.round(overscrollTop), listener);
+  private void finishSpinner(final float overscrollTop) {
+    mActionSelected = overscrollTop > mTotalDragDistance;
+    animateOffsetToStartPosition();
   }
 
   @Override
@@ -606,7 +555,7 @@ public class SwipeActionLayout extends ViewGroup
         final float overscrollTop = (y - mInitialMotionY) * DRAG_RATE;
         if (mIsBeingDragged) {
           if (overscrollTop > 0) {
-            moveSpinner(overscrollTop);
+            moveActionLayout(overscrollTop);
           } else {
             return false;
           }
@@ -648,23 +597,18 @@ public class SwipeActionLayout extends ViewGroup
     return true;
   }
 
-  private void animateOffsetToStartPosition(int from, AnimationListener listener) {
-    mFrom = from;
+  private void animateOffsetToStartPosition() {
+    mFrom = Math.round(ViewCompat.getTranslationY(mActionLayout));
     mAnimateToStartPosition.reset();
     mAnimateToStartPosition.setDuration(ANIMATE_TO_START_DURATION);
     mAnimateToStartPosition.setInterpolator(mDecelerateInterpolator);
-    mActionLayout.setAnimationListener(listener);
+    mAnimateToStartPosition.setAnimationListener(mMoveToStartListener);
     mActionLayout.clearAnimation();
     mActionLayout.startAnimation(mAnimateToStartPosition);
   }
 
-  // FIXME: 10/15/15 : offset formula is wrong
   private void moveToStart(float interpolatedTime) {
-    //int targetTop = (mFrom + (int) ((mOriginalOffsetTop - mFrom) * interpolatedTime));
-    //int offset = targetTop - mActionLayout.getTop();
-    Log.d("ME", "mFrom: " + mFrom + "; top: " + mActionLayout.getTop());
-    int offset = Math.round(-(1 - interpolatedTime) * mActionLayout.getTop());
-    setTargetOffsetTopAndBottom(offset);
+    setTargetOffsetTopAndBottom(Math.round((1 - interpolatedTime) * mFrom));
   }
 
   private final Animation mAnimateToStartPosition = new Animation() {
@@ -674,10 +618,7 @@ public class SwipeActionLayout extends ViewGroup
     }
   };
 
-  // called when sliding
   private void setTargetOffsetTopAndBottom(int offset) {
-    Log.d("ME", "offset: " + offset);
-    //mActionLayout.bringToFront();
     ViewCompat.setTranslationY(mActionLayout, offset);
     ViewCompat.setTranslationY(mAbsListView, offset);
     mCurrentTargetOffsetTop = mActionLayout.getTop();
