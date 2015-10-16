@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -29,6 +30,8 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 public class ActionLayout extends FrameLayout {
 
   private static final int ITEM_WEIGHT = 1;
+  private static final AccelerateInterpolator ACCELERATE_INTERPOLATOR =
+      new AccelerateInterpolator();
 
   private final int imageViewMargin;
   private final int selectedSize;
@@ -174,12 +177,21 @@ public class ActionLayout extends FrameLayout {
             break;
           }
 
-          final float perc = (selectedIndex * iW + xS - pX) / (2.0f * xS);
-          final float sX = perc / 2 + 1;
+          // actual progress
+          final float t = getInRange((selectedIndex * iW + xS - pX) / (2.0f * xS), 0f, 1f);
+          // scale
+          final float sX = t / 2 + 1;
+          // position in the middle
+          final int mX = iW * selectedIndex + (iW - selectedSize) / 2;
+          // interpolated progress
+          final float it = getInRange(ACCELERATE_INTERPOLATOR.getInterpolation(t), 0f, 1f);
+          // amount to move
+          final int dX = Math.round(it * 2 * xS);
+          // target
+          final int tX = mX - dX;
+
           selectedImageView.setPivotX(0);
           selectedImageView.setScaleX(sX);
-
-          final float tX = selectedIndex * iW + xS - perc * perc * 2 * xS;
           selectedImageView.setTranslationX(tX);
 
           if (pX < iW * selectedIndex - xS) {
@@ -192,12 +204,21 @@ public class ActionLayout extends FrameLayout {
             break;
           }
 
-          final float perc = (pX - (selectedIndex + 1) * iW + xS) / (2.0f * xS);
-          final float sX = perc / 2 + 1;
+          // actual progress
+          final float t = (pX - (selectedIndex + 1) * iW + xS) / (2.0f * xS);
+          // scale
+          final float sX = t / 2 + 1;
+          // position in the middle
+          final int mX = iW * selectedIndex + (iW - selectedSize) / 2;
+          // interpolated progress
+          final float it = ACCELERATE_INTERPOLATOR.getInterpolation(t);
+          // amount to move
+          final int dX = Math.round(it * 2 * xS);
+          // target
+          final int tX = mX + dX;
+
           selectedImageView.setPivotX(selectedSize);
           selectedImageView.setScaleX(sX);
-
-          final float tX = selectedIndex * iW + xS + 2 * xS * perc * perc;
           selectedImageView.setTranslationX(tX);
 
           if (pX > iW * (selectedIndex + 1) + xS) {
@@ -215,6 +236,10 @@ public class ActionLayout extends FrameLayout {
         setSelectedIndex(newSelectedIndex, iW);
         break;
     }
+  }
+
+  private float getInRange(final float value, final float min, final float max) {
+    return Math.max(min, Math.min(max, value));
   }
 
   private void setSelectedIndex(final int newSelectedIndex, final int iW) {
