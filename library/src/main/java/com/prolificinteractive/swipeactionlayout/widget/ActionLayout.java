@@ -217,7 +217,7 @@ public class ActionLayout extends FrameLayout {
           final int dX = Math.round(it * 2 * xS);
           // target
           final int tX = mX + dX;
-          
+
           selectedImageView.setPivotX(selectedSize);
           selectedImageView.setScaleX(sX);
           selectedImageView.setTranslationX(tX);
