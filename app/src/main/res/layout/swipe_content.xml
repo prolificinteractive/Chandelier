@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/colorPrimary"
+    android:elevation="@dimen/elevation"
+    android:gravity="center_vertical"
+    android:minHeight="80dp"
+    android:orientation="horizontal"
+    android:padding="@dimen/activity_horizontal_margin">
+
+    <ImageView
+        style="@style/swipe_item"
+        android:src="@android:drawable/ic_dialog_email" />
+
+    <ImageView
+        style="@style/swipe_item"
+        android:src="@android:drawable/ic_dialog_dialer" />
+
+    <ImageView
+        style="@style/swipe_item"
+        android:src="@android:drawable/ic_dialog_alert" />
+
+</LinearLayout>
