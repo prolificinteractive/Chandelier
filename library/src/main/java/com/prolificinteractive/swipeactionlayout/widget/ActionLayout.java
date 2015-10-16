@@ -31,6 +31,7 @@ public class ActionLayout extends FrameLayout {
   private static final int ITEM_WEIGHT = 1;
   private static final AccelerateInterpolator ACCELERATE_INTERPOLATOR =
       new AccelerateInterpolator();
+  public static final String TAG = ActionLayout.class.getSimpleName();
 
   private final int imageViewMargin;
   private final int selectedSize;
@@ -46,11 +47,7 @@ public class ActionLayout extends FrameLayout {
 
   private final Animator.AnimatorListener animatorListener = new Animator.AnimatorListener() {
     @Override public void onAnimationStart(Animator animation) {
-      for (int i = 0; i < actionItems.size(); i++) {
-        imageViews.get(i).setBackgroundResource(actionItems.get(i).unselectedResId);
-      }
-      imageViews.get(selectedIndex)
-          .setBackgroundResource(actionItems.get(selectedIndex).selectedResId);
+      updateSelectedImageView();
     }
 
     @Override public void onAnimationEnd(Animator animation) {
@@ -69,6 +66,15 @@ public class ActionLayout extends FrameLayout {
 
     }
   };
+
+  private void updateSelectedImageView() {
+    for (int i = 0; i < actionItems.size(); i++) {
+      imageViews.get(i).setBackgroundResource(actionItems.get(i).unselectedResId);
+    }
+    imageViews.get(selectedIndex)
+        .setBackgroundResource(actionItems.get(selectedIndex).selectedResId);
+  }
+
   private Animation.AnimationListener actionListener;
 
   public ActionLayout(final Context context, final AttributeSet attrs) {
@@ -141,6 +147,7 @@ public class ActionLayout extends FrameLayout {
         container.addView(frame);
       }
       selectedIndex = actionItems.size() / 2;
+      updateSelectedImageView();
     }
   }
 
@@ -226,8 +233,7 @@ public class ActionLayout extends FrameLayout {
           }
         } else {
           // middle case
-          selectedImageView.setPivotX(selectedSize / 2);
-          setSelectedIndex(newSelectedIndex);
+          selectedImageView.setTranslationX(selectedIndex * iW + (iW - selectedSize) / 2);
         }
         break;
 
