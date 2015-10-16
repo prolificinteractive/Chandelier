@@ -137,6 +137,7 @@ public class ActionLayout extends FrameLayout {
         frame.addView(imageView);
         container.addView(frame);
       }
+      selectedIndex = actionItems.size() / 2;
     }
   }
 
@@ -205,18 +206,18 @@ public class ActionLayout extends FrameLayout {
           }
 
           // actual progress
-          final float t = (pX - (selectedIndex + 1) * iW + xS) / (2.0f * xS);
+          final float t = getInRange((pX - (selectedIndex + 1) * iW + xS) / (2.0f * xS), 0f, 1f);
           // scale
           final float sX = t / 2 + 1;
           // position in the middle
           final int mX = iW * selectedIndex + (iW - selectedSize) / 2;
           // interpolated progress
-          final float it = ACCELERATE_INTERPOLATOR.getInterpolation(t);
+          final float it = getInRange(ACCELERATE_INTERPOLATOR.getInterpolation(t), 0f, 1f);
           // amount to move
           final int dX = Math.round(it * 2 * xS);
           // target
           final int tX = mX + dX;
-
+          
           selectedImageView.setPivotX(selectedSize);
           selectedImageView.setScaleX(sX);
           selectedImageView.setTranslationX(tX);
