@@ -11,7 +11,6 @@ import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -30,17 +29,11 @@ public class SwipeActionLayout extends ViewGroup
 
   private static final int MAX_ALPHA = 255;
   private static final int STARTING_PROGRESS_ALPHA = (int) (.3f * MAX_ALPHA);
-
   private static final float DECELERATE_INTERPOLATION_FACTOR = 2f;
   private static final int INVALID_POINTER = -1;
   private static final float DRAG_RATE = .8f;
-
   private static final int ALPHA_ANIMATION_DURATION = 300;
-
   private static final int ANIMATE_TO_START_DURATION = 300;
-
-  // Default offset in dips from the top of the view to where the progress spinner should stop
-  private static final int DEFAULT_CIRCLE_TARGET = 64;
 
   private final AttributeSet mAttrs;
 
@@ -129,14 +122,9 @@ public class SwipeActionLayout extends ViewGroup
     setEnabled(a.getBoolean(0, true));
     a.recycle();
 
-    final DisplayMetrics metrics = getResources().getDisplayMetrics();
-
     createProgressView();
     ViewCompat.setChildrenDrawingOrderEnabled(this, true);
     // the absolute offset has to take into account that the circle starts at an offset
-    mSpinnerFinalOffset = DEFAULT_CIRCLE_TARGET * metrics.density;
-    mSpinnerFinalOffset = 0 * metrics.density;
-    mTotalDragDistance = mSpinnerFinalOffset;
     mNestedScrollingParentHelper = new NestedScrollingParentHelper(this);
 
     mNestedScrollingChildHelper = new NestedScrollingChildHelper(this);
@@ -157,31 +145,6 @@ public class SwipeActionLayout extends ViewGroup
     mListener = listener;
   }
 
-  private void startProgressAlphaStartAnimation() {
-    mAlphaStartAnimation = startAlphaAnimation(mAlpha, STARTING_PROGRESS_ALPHA);
-  }
-
-  private void startProgressAlphaMaxAnimation() {
-    mAlphaMaxAnimation = startAlphaAnimation(mAlpha, MAX_ALPHA);
-  }
-
-  private Animation startAlphaAnimation(final int startingAlpha, final int endingAlpha) {
-    // Pre API 11, alpha is used in place of scale. Don't also use it to
-    // show the trigger point.
-    Animation alpha = new Animation() {
-      @Override
-      public void applyTransformation(float interpolatedTime, Transformation t) {
-        mAlpha = (int) (startingAlpha + ((endingAlpha - startingAlpha) * interpolatedTime));
-      }
-    };
-    alpha.setDuration(ALPHA_ANIMATION_DURATION);
-    // Clear out the previous animation listeners.
-    mActionLayout.setAnimationListener(null);
-    mActionLayout.clearAnimation();
-    mActionLayout.startAnimation(alpha);
-    return alpha;
-  }
-
   private void ensureTarget() {
     // Don't bother getting the parent height if the parent hasn't been laid
     // out yet.
@@ -193,16 +156,14 @@ public class SwipeActionLayout extends ViewGroup
           break;
         }
       }
+    }
 
-      // Don't bother getting the parent height if the parent hasn't been laid
-      // out yet.
-      if (mAbsListView == null) {
-        for (int i = 0; i < getChildCount(); i++) {
-          final View child = getChildAt(i);
-          if (child instanceof ScrollingView) {
-            mAbsListView = child;
-            break;
-          }
+    if (mAbsListView == null) {
+      for (int i = 0; i < getChildCount(); i++) {
+        final View child = getChildAt(i);
+        if (child instanceof ScrollingView) {
+          mAbsListView = child;
+          break;
         }
       }
     }
@@ -227,10 +188,8 @@ public class SwipeActionLayout extends ViewGroup
     final int childWidth = width - getPaddingLeft() - getPaddingRight();
     final int childHeight = height - getPaddingTop() - getPaddingBottom();
     child.layout(childLeft, childTop, childLeft + childWidth, childTop + childHeight);
-    int circleWidth = mActionLayout.getMeasuredWidth();
-    int circleHeight = mActionLayout.getMeasuredHeight();
-    mActionLayout.layout((width / 2 - circleWidth / 2), mCurrentTargetOffsetTop,
-        (width / 2 + circleWidth / 2), mCurrentTargetOffsetTop + circleHeight);
+    mActionLayout.layout(0, mCurrentTargetOffsetTop,
+        width, mCurrentTargetOffsetTop + mActionLayout.getMeasuredHeight());
   }
 
   @Override
@@ -417,7 +376,7 @@ public class SwipeActionLayout extends ViewGroup
     // Finish the spinner for nested scrolling if we ever consumed any
     // unconsumed nested scroll
     if (mTotalUnconsumed > 0) {
-      finishSpinner(mTotalUnconsumed);
+      finishAction(mTotalUnconsumed);
       mTotalUnconsumed = 0;
     }
     // Dispatch up our nested parent
@@ -500,29 +459,36 @@ public class SwipeActionLayout extends ViewGroup
   }
 
   private void moveActionLayout(final float overscrollTop) {
-    float originalDragPercent = overscrollTop / mTotalDragDistance;
-    float dragPercent = Math.min(1f, Math.abs(originalDragPercent));
+    final float originalDragPercent = overscrollTop / mTotalDragDistance;
+    final float dragPercent = Math.min(1f, Math.abs(originalDragPercent));
     final int targetY = mOriginalOffsetTop + (int) (mSpinnerFinalOffset * dragPercent);
+
     if (mActionLayout.getVisibility() != View.VISIBLE) {
       mActionLayout.setVisibility(View.VISIBLE);
     }
-    if (overscrollTop < mTotalDragDistance) {
-      if (mAlpha > STARTING_PROGRESS_ALPHA && !isAnimationRunning(mAlphaStartAnimation)) {
-        // Animate the alpha
-        startProgressAlphaStartAnimation();
-      }
-    } else {
-      if (mAlpha < MAX_ALPHA && !isAnimationRunning(mAlphaMaxAnimation)) {
-        // Animate the alpha
-        startProgressAlphaMaxAnimation();
-      }
-    }
+
     setTargetOffsetTopAndBottom(targetY - mCurrentTargetOffsetTop);
   }
 
-  private void finishSpinner(final float overscrollTop) {
+  private void finishAction(final float overscrollTop) {
     mActionSelected = overscrollTop > mTotalDragDistance;
-    animateOffsetToStartPosition();
+    if (mActionSelected) {
+      mActionLayout.finishAction(new AnimationListener() {
+        @Override public void onAnimationStart(Animation animation) {
+
+        }
+
+        @Override public void onAnimationEnd(Animation animation) {
+          animateOffsetToStartPosition();
+        }
+
+        @Override public void onAnimationRepeat(Animation animation) {
+
+        }
+      });
+    } else {
+      animateOffsetToStartPosition();
+    }
   }
 
   @Override
@@ -584,7 +550,7 @@ public class SwipeActionLayout extends ViewGroup
         final float y = MotionEventCompat.getY(ev, pointerIndex);
         final float overscrollTop = (y - mInitialMotionY) * DRAG_RATE;
         mIsBeingDragged = false;
-        finishSpinner(overscrollTop);
+        finishAction(overscrollTop);
         mActivePointerId = INVALID_POINTER;
         return false;
       }
@@ -618,7 +584,7 @@ public class SwipeActionLayout extends ViewGroup
     }
   };
 
-  private void setTargetOffsetTopAndBottom(int offset) {
+  private void setTargetOffsetTopAndBottom(final int offset) {
     ViewCompat.setTranslationY(mActionLayout, offset);
     ViewCompat.setTranslationY(mAbsListView, offset);
     mCurrentTargetOffsetTop = mActionLayout.getTop();
@@ -641,7 +607,7 @@ public class SwipeActionLayout extends ViewGroup
 
   /**
    * Classes that wish to be notified when the swipe gesture correctly
-   * triggers a refresh should implement this interface.
+   * triggers an action should implement this interface.
    */
   public interface OnActionListener {
     void onActionSelected(int index);

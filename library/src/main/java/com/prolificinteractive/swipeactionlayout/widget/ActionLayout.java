@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.support.annotation.DrawableRes;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -41,7 +40,6 @@ public class ActionLayout extends FrameLayout {
   private final List<ActionItem> actionItems = new ArrayList<>();
   private final List<ImageView> imageViews = new ArrayList<>();
 
-  private Animation.AnimationListener mListener;
   private int measuredWidth;
   private int selectedIndex = -1;
   private boolean isAnimating = false;
@@ -57,6 +55,10 @@ public class ActionLayout extends FrameLayout {
 
     @Override public void onAnimationEnd(Animator animation) {
       isAnimating = false;
+      if (actionListener != null) {
+        actionListener.onAnimationEnd(null);
+      }
+      actionListener = null;
     }
 
     @Override public void onAnimationCancel(Animator animation) {
@@ -67,6 +69,7 @@ public class ActionLayout extends FrameLayout {
 
     }
   };
+  private Animation.AnimationListener actionListener;
 
   public ActionLayout(final Context context, final AttributeSet attrs) {
     super(context);
@@ -146,10 +149,6 @@ public class ActionLayout extends FrameLayout {
     this.measuredWidth = getMeasuredWidth();
   }
 
-  private int getInRange(final int value, final int min, final int max) {
-    return Math.max(min, Math.min(max, value));
-  }
-
   public void onParentTouchEvent(final MotionEvent ev) {
     if (measuredWidth <= 0 || isAnimating) {
       return;
@@ -196,7 +195,7 @@ public class ActionLayout extends FrameLayout {
           selectedImageView.setTranslationX(tX);
 
           if (pX < iW * selectedIndex - xS) {
-            setSelectedIndex(newSelectedIndex, iW);
+            setSelectedIndex(newSelectedIndex);
           }
         } else if (pX > (selectedIndex + 1) * iW - xS) {
           // last third
@@ -223,18 +222,18 @@ public class ActionLayout extends FrameLayout {
           selectedImageView.setTranslationX(tX);
 
           if (pX > iW * (selectedIndex + 1) + xS) {
-            setSelectedIndex(newSelectedIndex, iW);
+            setSelectedIndex(newSelectedIndex);
           }
         } else {
           // middle case
           selectedImageView.setPivotX(selectedSize / 2);
-          setSelectedIndex(newSelectedIndex, iW);
+          setSelectedIndex(newSelectedIndex);
         }
         break;
 
       case MotionEvent.ACTION_UP:
       case MotionEvent.ACTION_CANCEL:
-        setSelectedIndex(newSelectedIndex, iW);
+        //setSelectedIndex(newSelectedIndex);
         break;
     }
   }
@@ -243,9 +242,9 @@ public class ActionLayout extends FrameLayout {
     return Math.max(min, Math.min(max, value));
   }
 
-  private void setSelectedIndex(final int newSelectedIndex, final int iW) {
-    // FIXME: 10/15/15 : fix animation jumpy state
+  private void setSelectedIndex(final int newSelectedIndex) {
     selectedIndex = newSelectedIndex;
+    final int iW = measuredWidth / actionItems.size();
     final int target = iW * selectedIndex + (iW - selectedSize) / 2;
     isAnimating = true;
     selectedImageView.animate()
@@ -255,8 +254,17 @@ public class ActionLayout extends FrameLayout {
         .setListener(animatorListener);
   }
 
+  private int getInRange(final int value, final int min, final int max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
   int getSelectedIndex() {
     return selectedIndex;
+  }
+
+  public void finishAction(Animation.AnimationListener mActionListener) {
+    actionListener = mActionListener;
+    setSelectedIndex(selectedIndex);
   }
 
   public static class ActionItem {
@@ -264,33 +272,11 @@ public class ActionLayout extends FrameLayout {
     private final int unselectedResId;
 
     public ActionItem(
-        @NonNull final int selectedDrawableResId,
+        @DrawableRes final int selectedDrawableResId,
         @DrawableRes final int unselectedDrawableResId
     ) {
       this.selectedResId = selectedDrawableResId;
       this.unselectedResId = unselectedDrawableResId;
     }
   }
-
-  //region Animations
-  public void setAnimationListener(Animation.AnimationListener listener) {
-    mListener = listener;
-  }
-
-  @Override
-  public void onAnimationStart() {
-    super.onAnimationStart();
-    if (mListener != null) {
-      mListener.onAnimationStart(getAnimation());
-    }
-  }
-
-  @Override
-  public void onAnimationEnd() {
-    super.onAnimationEnd();
-    if (mListener != null) {
-      mListener.onAnimationEnd(getAnimation());
-    }
-  }
-  //endregion
 }
