@@ -25,6 +25,7 @@
       app:al_selected_size="@dimen/action_selected_size"
       app:ai_layout_height="20dp"
       app:ai_layout_width="20dp"
+      app:al_scale_enabled="true"
       >
 
     <include layout="@layout/content_main" />

@@ -7,7 +7,6 @@ import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -48,6 +47,7 @@ public class ActionLayout extends FrameLayout {
   private final int actionItemLayoutHeight;
   private final int actionItemLayoutWidth;
 
+  private boolean isScaleEnabled;
   private int measuredWidth;
   private int selectedIndex = -1;
   private boolean isAnimating = false;
@@ -97,8 +97,13 @@ public class ActionLayout extends FrameLayout {
     int defaultElevation = res.getInteger(R.integer.default_elevation);
     int defaultSelectorMargin = res.getInteger(R.integer.default_selector_margin);
     int defaultSelectorSize = res.getInteger(R.integer.default_selector_size);
-    actionItemLayoutHeight = a.getDimensionPixelSize(R.styleable.SwipeActionLayout_ai_layout_height,
-        WRAP_CONTENT);
+    boolean defaultScaleEnabled = res.getBoolean(R.bool.default_scale_enabled);
+
+    isScaleEnabled = a.getBoolean(R.styleable.SwipeActionLayout_al_scale_enabled,
+        defaultScaleEnabled);
+    actionItemLayoutHeight =
+        a.getDimensionPixelSize(R.styleable.SwipeActionLayout_ai_layout_height,
+            WRAP_CONTENT);
     actionItemLayoutWidth = a.getDimensionPixelSize(R.styleable.SwipeActionLayout_ai_layout_width,
         WRAP_CONTENT);
 
@@ -108,15 +113,18 @@ public class ActionLayout extends FrameLayout {
     setBackground(a.getDrawable(R.styleable.SwipeActionLayout_al_background));
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      setElevation(a.getDimensionPixelSize(R.styleable.SwipeActionLayout_al_elevation, defaultElevation));
+      setElevation(
+          a.getDimensionPixelSize(R.styleable.SwipeActionLayout_al_elevation, defaultElevation));
     }
 
     container.setOrientation(LinearLayout.HORIZONTAL);
     container.setGravity(CENTER_VERTICAL);
 
     // Action Item
-    imageViewMargin = a.getDimensionPixelSize(R.styleable.SwipeActionLayout_ai_margin, defaultSelectorMargin);
-    selectedSize = a.getDimensionPixelSize(R.styleable.SwipeActionLayout_al_selected_size, defaultSelectorSize);
+    imageViewMargin =
+        a.getDimensionPixelSize(R.styleable.SwipeActionLayout_ai_margin, defaultSelectorMargin);
+    selectedSize = a.getDimensionPixelSize(R.styleable.SwipeActionLayout_al_selected_size,
+        defaultSelectorSize);
     selectedImageView = new ImageView(context);
     final LayoutParams selectedLp = new LayoutParams(selectedSize, selectedSize, CENTER_VERTICAL);
     selectedLp.setMargins(0, imageViewMargin, 0, imageViewMargin);
@@ -205,7 +213,7 @@ public class ActionLayout extends FrameLayout {
           // actual progress
           final float t = getInRange((selectedIndex * iW + xS - pX) / (2f * xS), 0f, 1f);
           // scale
-          final float sX = t / 2 + 1;
+          final float sX = isScaleEnabled ? t / 2 + 1 : 1;
           // position in the middle
           final int mX = iW * selectedIndex + (iW - selectedSize) / 2;
           // interpolated progress
@@ -232,7 +240,7 @@ public class ActionLayout extends FrameLayout {
           // actual progress
           final float t = getInRange((pX - (selectedIndex + 1) * iW + xS) / (2f * xS), 0f, 1f);
           // scale
-          final float sX = t / 2 + 1;
+          final float sX = isScaleEnabled ? t / 2 + 1 : 1;
           // position in the middle
           final int mX = iW * selectedIndex + (iW - selectedSize) / 2;
           // interpolated progress

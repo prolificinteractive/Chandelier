@@ -4,4 +4,5 @@
   <integer name="default_selector_margin">0</integer>
   <integer name="default_selector_size">0</integer>
   <drawable name="default_selector">@drawable/item_white_circle</drawable>
+  <bool name="default_scale_enabled">true</bool>
 </resources>
