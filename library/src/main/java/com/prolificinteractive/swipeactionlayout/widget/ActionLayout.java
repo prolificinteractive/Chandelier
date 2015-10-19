@@ -2,7 +2,9 @@ package com.prolificinteractive.swipeactionlayout.widget;
 
 import android.animation.Animator;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
@@ -40,6 +42,8 @@ public class ActionLayout extends FrameLayout {
   private final ImageView selectedImageView;
   private final List<ActionItem> actionItems = new ArrayList<>();
   private final List<ImageView> imageViews = new ArrayList<>();
+  private final int actionItemLayoutHeight;
+  private final int actionItemLayoutWidth;
 
   private int measuredWidth;
   private int selectedIndex = -1;
@@ -80,6 +84,7 @@ public class ActionLayout extends FrameLayout {
   public ActionLayout(final Context context, final AttributeSet attrs) {
     super(context);
 
+    Resources res = getResources();
     setMinimumHeight(200);
 
     final TypedArray a = context.getTheme().obtainStyledAttributes(
@@ -87,29 +92,41 @@ public class ActionLayout extends FrameLayout {
         R.styleable.SwipeActionLayout,
         0, 0);
 
-    // Action Layout
+    // Defaults
+    int defaultElevation = res.getInteger(R.integer.default_elevation);
+    int defaultSelectorMargin = res.getInteger(R.integer.default_selector_margin);
+    int defaultSelectorSize = res.getInteger(R.integer.default_selector_size);
+    actionItemLayoutHeight = a.getDimensionPixelSize(R.styleable.SwipeActionLayout_ai_layout_height,
+        WRAP_CONTENT);
+    actionItemLayoutWidth = a.getDimensionPixelSize(R.styleable.SwipeActionLayout_ai_layout_width,
+        WRAP_CONTENT);
 
+    // Action Layout
     container = new LinearLayout(context);
     container.setLayoutParams(new LayoutParams(MATCH_PARENT, WRAP_CONTENT, CENTER_VERTICAL));
     setBackground(a.getDrawable(R.styleable.SwipeActionLayout_al_background));
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      setElevation(a.getDimensionPixelSize(R.styleable.SwipeActionLayout_al_elevation, 0));
+      setElevation(a.getDimensionPixelSize(R.styleable.SwipeActionLayout_al_elevation, defaultElevation));
     }
 
     container.setOrientation(LinearLayout.HORIZONTAL);
     container.setGravity(CENTER_VERTICAL);
 
     // Action Item
-
-    imageViewMargin = a.getDimensionPixelSize(R.styleable.SwipeActionLayout_ai_margin, 0);
-    selectedSize = a.getDimensionPixelSize(R.styleable.SwipeActionLayout_al_selected_size, 0);
-
+    imageViewMargin = a.getDimensionPixelSize(R.styleable.SwipeActionLayout_ai_margin, defaultSelectorMargin);
+    selectedSize = a.getDimensionPixelSize(R.styleable.SwipeActionLayout_al_selected_size, defaultSelectorSize);
     selectedImageView = new ImageView(context);
     final LayoutParams selectedLp = new LayoutParams(selectedSize, selectedSize, CENTER_VERTICAL);
     selectedLp.setMargins(0, imageViewMargin, 0, imageViewMargin);
     selectedImageView.setLayoutParams(selectedLp);
-    selectedImageView.setBackground(a.getDrawable(R.styleable.SwipeActionLayout_al_selected));
+
+    Drawable selectorBackground = a.getDrawable(R.styleable.SwipeActionLayout_al_selector);
+    if (selectorBackground != null) {
+      selectedImageView.setBackground(selectorBackground);
+    } else {
+      selectedImageView.setBackground(res.getDrawable(R.drawable.default_selector));
+    }
 
     addView(selectedImageView);
     addView(container);
@@ -133,8 +150,8 @@ public class ActionLayout extends FrameLayout {
 
         final ImageView imageView = new ImageView(context);
         final FrameLayout.LayoutParams imageLp = new FrameLayout.LayoutParams(
-            WRAP_CONTENT,
-            WRAP_CONTENT,
+            actionItemLayoutWidth,
+            actionItemLayoutHeight,
             CENTER
         );
         imageLp.setMargins(imageViewMargin, imageViewMargin, imageViewMargin, imageViewMargin);

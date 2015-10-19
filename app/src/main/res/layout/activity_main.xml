@@ -22,8 +22,9 @@
       app:ai_margin="@dimen/swipe_action_margin"
       app:al_background="?attr/colorPrimary"
       app:al_elevation="@dimen/elevation"
-      app:al_selected="@drawable/item_action_selected"
       app:al_selected_size="@dimen/action_selected_size"
+      app:ai_layout_height="20dp"
+      app:ai_layout_width="20dp"
       >
 
     <include layout="@layout/content_main" />
