@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <integer name="default_elevation">0</integer>
-  <integer name="default_selector_margin">0</integer>
-  <integer name="default_selector_size">0</integer>
+  <dimen name="default_elevation">4dp</dimen>
+  <dimen name="default_selector_margin">16dp</dimen>
+  <dimen name="default_selector_size">40dp</dimen>
   <drawable name="default_selector">@drawable/item_white_circle</drawable>
   <bool name="default_scale_enabled">true</bool>
 </resources>

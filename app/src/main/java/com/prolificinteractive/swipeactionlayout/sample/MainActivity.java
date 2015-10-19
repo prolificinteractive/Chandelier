@@ -1,107 +1,85 @@
 package com.prolificinteractive.swipeactionlayout.sample;
 
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
-import com.prolificinteractive.swipeactionlayout.widget.ActionItem;
-import com.prolificinteractive.swipeactionlayout.widget.ActionLayout;
-import com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout;
 import java.util.Arrays;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-
-  private SwipeActionLayout swipeActionLayout;
-  private RecyclerView list;
-  private DummyAdapter adapter;
+  private static final String CATEGORY_SAMPLE = "com.prolificinteractive.swipeactionlayout.sample.SAMPLE";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-
     setContentView(R.layout.activity_main);
-
-    final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 
-    swipeActionLayout = (SwipeActionLayout) findViewById(R.id.swipe_action_layout);
-    swipeActionLayout.setOnActionSelectedListener(new SwipeActionLayout.OnActionListener() {
-      @Override public void onActionSelected(int index) {
-        Toast.makeText(MainActivity.this, index + "", Toast.LENGTH_SHORT).show();
-      }
-    });
-
-    adapter = new DummyAdapter();
-    list = (RecyclerView) findViewById(android.R.id.list);
+    RecyclerView list = (RecyclerView) findViewById(android.R.id.list);
     list.setLayoutManager(new LinearLayoutManager(this));
-    list.setAdapter(adapter);
-
-    swipeActionLayout.populateActionItems(Arrays.asList(
-        new ActionItem(R.drawable.ic_close_purple_light, R.drawable.ic_close_light),
-        new ActionItem(R.drawable.ic_add_purple_light, R.drawable.ic_add_light),
-        new ActionItem(R.drawable.ic_check_purple_light, R.drawable.ic_check_light)
-    ));
+    list.setAdapter(new SampleAdapter(this, getAllSampleActivities()));
   }
 
-  @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
-    // Inflate the menu; this adds items to the action bar if it is present.
-    getMenuInflater().inflate(R.menu.menu_main, menu);
-    return true;
+  private List<ResolveInfo> getAllSampleActivities() {
+    Intent filter = new Intent();
+    filter.setAction(Intent.ACTION_RUN);
+    filter.addCategory(CATEGORY_SAMPLE);
+    return getPackageManager().queryIntentActivities(filter, 0);
   }
 
-  @Override
-  public boolean onOptionsItemSelected(MenuItem item) {
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
-    int id = item.getItemId();
+  private class SampleAdapter extends RecyclerView.Adapter<SampleAdapter.SampleViewHolder> {
+    private final List<ResolveInfo> samples;
+    private final LayoutInflater inflater;
+    private final PackageManager pm;
 
-    //noinspection SimplifiableIfStatement
-    if (id == R.id.action_settings) {
-      return true;
+    public SampleAdapter(Context context, List<ResolveInfo> resolveInfos) {
+      this.samples = resolveInfos;
+      this.inflater = LayoutInflater.from(context);
+      this.pm = context.getPackageManager();
     }
 
-    return super.onOptionsItemSelected(item);
-  }
-
-  class DummyAdapter extends RecyclerView.Adapter<DummyViewHolder> {
-
-    @Override
-    public DummyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-      return new DummyViewHolder(
-          LayoutInflater.from(parent.getContext()).inflate(R.layout.item_dummy, list, false));
+    @Override public SampleViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+      View view = inflater.inflate(android.R.layout.simple_list_item_1, parent, false);
+      return new SampleViewHolder(view);
     }
 
-    @Override
-    public void onBindViewHolder(DummyViewHolder holder, int position) {
-      holder.title.setText(String.format("Title %d", position));
-      holder.subtitle.setText(String.format("Subtitle %d", position));
+    @Override public void onBindViewHolder(SampleViewHolder holder, int position) {
+      holder.activityName.setText(samples.get(position).loadLabel(pm));
     }
 
-    @Override
-    public int getItemCount() {
-      return 10;
+    @Override public int getItemCount() {
+      return samples.size();
     }
-  }
 
-  class DummyViewHolder extends RecyclerView.ViewHolder {
+    class SampleViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+      TextView activityName;
 
-    final TextView title;
-    final TextView subtitle;
+      public SampleViewHolder(View view) {
+        super(view);
+        activityName = (TextView) view.findViewById(android.R.id.text1);
+        view.setOnClickListener(this);
+      }
 
-    public DummyViewHolder(View view) {
-      super(view);
-      title = (TextView) view.findViewById(android.R.id.text1);
-      subtitle = (TextView) view.findViewById(android.R.id.text2);
+      @Override public void onClick(View v) {
+        ActivityInfo activity = samples.get(getAdapterPosition()).activityInfo;
+        ComponentName name = new ComponentName(activity.applicationInfo.packageName, activity.name);
+        startActivity(new Intent(Intent.ACTION_VIEW).setComponent(name));
+      }
     }
   }
+
 }

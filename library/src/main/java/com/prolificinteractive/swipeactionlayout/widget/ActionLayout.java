@@ -94,9 +94,9 @@ public class ActionLayout extends FrameLayout {
         0, 0);
 
     // Defaults
-    int defaultElevation = res.getInteger(R.integer.default_elevation);
-    int defaultSelectorMargin = res.getInteger(R.integer.default_selector_margin);
-    int defaultSelectorSize = res.getInteger(R.integer.default_selector_size);
+    int defaultElevation = res.getDimensionPixelSize(R.dimen.default_elevation);
+    int defaultSelectorMargin = res.getDimensionPixelSize(R.dimen.default_selector_margin);
+    int defaultSelectorSize = res.getDimensionPixelSize(R.dimen.default_selector_size);
     boolean defaultScaleEnabled = res.getBoolean(R.bool.default_scale_enabled);
 
     isScaleEnabled = a.getBoolean(R.styleable.SwipeActionLayout_al_scale_enabled,
