@@ -12,13 +12,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.prolificinteractive.swipeactionlayout.widget.ActionItem;
 import com.prolificinteractive.swipeactionlayout.widget.ActionLayout;
 import com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout;
 import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity {
-
-  private static final Integer LOCK = 0;
 
   private SwipeActionLayout swipeActionLayout;
   private RecyclerView list;
@@ -46,9 +45,9 @@ public class MainActivity extends AppCompatActivity {
     list.setAdapter(adapter);
 
     swipeActionLayout.populateActionItems(Arrays.asList(
-        new ActionLayout.ActionItem(R.drawable.ic_close_purple_light, R.drawable.ic_close_light),
-        new ActionLayout.ActionItem(R.drawable.ic_add_purple_light, R.drawable.ic_add_light),
-        new ActionLayout.ActionItem(R.drawable.ic_check_purple_light, R.drawable.ic_check_light)
+        new ActionItem(R.drawable.ic_close_purple_light, R.drawable.ic_close_light),
+        new ActionItem(R.drawable.ic_add_purple_light, R.drawable.ic_add_light),
+        new ActionItem(R.drawable.ic_check_purple_light, R.drawable.ic_check_light)
     ));
   }
 
@@ -84,8 +83,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBindViewHolder(DummyViewHolder holder, int position) {
-      holder.title.setText("Title " + position);
-      holder.subtitle.setText("Subtitle " + position);
+      holder.title.setText(String.format("Title %d", position));
+      holder.subtitle.setText(String.format("Subtitle %d", position));
     }
 
     @Override
