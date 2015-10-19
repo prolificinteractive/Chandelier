@@ -466,8 +466,8 @@ public class SwipeActionLayout extends ViewGroup
     if (mActionLayout.getVisibility() != View.VISIBLE) {
       mActionLayout.setVisibility(View.VISIBLE);
     }
-
     setTargetOffsetTopAndBottom(targetY - mCurrentTargetOffsetTop);
+    mActionLayout.onLayoutTranslated(1 - (float) targetY / mCurrentTargetOffsetTop);
   }
 
   private void finishAction(final float overscrollTop) {
@@ -601,7 +601,7 @@ public class SwipeActionLayout extends ViewGroup
     }
   }
 
-  public void populateActionItems(@Nullable final List<ActionLayout.ActionItem> items) {
+  public void populateActionItems(@Nullable final List<ActionItem> items) {
     mActionLayout.populateActionItems(items);
   }
 

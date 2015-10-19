@@ -6,8 +6,8 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
-import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -34,6 +34,9 @@ public class ActionLayout extends FrameLayout {
   private static final AccelerateInterpolator ACCELERATE_INTERPOLATOR =
       new AccelerateInterpolator();
   public static final String TAG = ActionLayout.class.getSimpleName();
+  private static final AccelerateDecelerateInterpolator ACCELERATE_DECELERATE_INTERPOLATOR =
+      new AccelerateDecelerateInterpolator();
+  private static final int DEFAULT_SCALE = 1;
 
   private final int imageViewMargin;
   private final int selectedSize;
@@ -83,10 +86,8 @@ public class ActionLayout extends FrameLayout {
 
   public ActionLayout(final Context context, final AttributeSet attrs) {
     super(context);
-
     Resources res = getResources();
     setMinimumHeight(200);
-
     final TypedArray a = context.getTheme().obtainStyledAttributes(
         attrs,
         R.styleable.SwipeActionLayout,
@@ -195,14 +196,14 @@ public class ActionLayout extends FrameLayout {
     switch (ev.getAction()) {
       case MotionEvent.ACTION_MOVE:
         if (pX < selectedIndex * iW + xS) {
-          // first third
+          // left edge
 
           if (selectedIndex == 0) {
             break;
           }
 
           // actual progress
-          final float t = getInRange((selectedIndex * iW + xS - pX) / (2.0f * xS), 0f, 1f);
+          final float t = getInRange((selectedIndex * iW + xS - pX) / (2f * xS), 0f, 1f);
           // scale
           final float sX = t / 2 + 1;
           // position in the middle
@@ -222,14 +223,14 @@ public class ActionLayout extends FrameLayout {
             setSelectedIndex(newSelectedIndex);
           }
         } else if (pX > (selectedIndex + 1) * iW - xS) {
-          // last third
+          // right edge
 
           if (selectedIndex == count - 1) {
             break;
           }
 
           // actual progress
-          final float t = getInRange((pX - (selectedIndex + 1) * iW + xS) / (2.0f * xS), 0f, 1f);
+          final float t = getInRange((pX - (selectedIndex + 1) * iW + xS) / (2f * xS), 0f, 1f);
           // scale
           final float sX = t / 2 + 1;
           // position in the middle
@@ -249,20 +250,12 @@ public class ActionLayout extends FrameLayout {
             setSelectedIndex(newSelectedIndex);
           }
         } else {
-          // middle case
+          // middle
           selectedImageView.setTranslationX(selectedIndex * iW + (iW - selectedSize) / 2);
+          selectedImageView.setScaleX(DEFAULT_SCALE);
         }
         break;
-
-      case MotionEvent.ACTION_UP:
-      case MotionEvent.ACTION_CANCEL:
-        //setSelectedIndex(newSelectedIndex);
-        break;
     }
-  }
-
-  private float getInRange(final float value, final float min, final float max) {
-    return Math.max(min, Math.min(max, value));
   }
 
   private void setSelectedIndex(final int newSelectedIndex) {
@@ -271,13 +264,17 @@ public class ActionLayout extends FrameLayout {
     final int target = iW * selectedIndex + (iW - selectedSize) / 2;
     isAnimating = true;
     selectedImageView.animate()
-        .scaleX(1)
+        .scaleX(DEFAULT_SCALE)
         .translationX(target)
-        .setInterpolator(new AccelerateDecelerateInterpolator())
+        .setInterpolator(ACCELERATE_DECELERATE_INTERPOLATOR)
         .setListener(animatorListener);
   }
 
   private int getInRange(final int value, final int min, final int max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  private float getInRange(final float value, final float min, final float max) {
     return Math.max(min, Math.min(max, value));
   }
 
@@ -290,16 +287,7 @@ public class ActionLayout extends FrameLayout {
     setSelectedIndex(selectedIndex);
   }
 
-  public static class ActionItem {
-    private final int selectedResId;
-    private final int unselectedResId;
+  public void onLayoutTranslated(final float progress) {
 
-    public ActionItem(
-        @DrawableRes final int selectedDrawableResId,
-        @DrawableRes final int unselectedDrawableResId
-    ) {
-      this.selectedResId = selectedDrawableResId;
-      this.unselectedResId = unselectedDrawableResId;
-    }
   }
 }
