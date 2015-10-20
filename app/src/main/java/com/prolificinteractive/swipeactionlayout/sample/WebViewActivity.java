@@ -4,14 +4,11 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
-import com.prolificinteractive.swipeactionlayout.sample.R;
 import com.prolificinteractive.swipeactionlayout.widget.ActionItem;
 import com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout;
 import java.util.Arrays;
@@ -39,9 +36,9 @@ public class WebViewActivity extends AppCompatActivity {
     });
 
     swipeActionLayout.populateActionItems(Arrays.asList(
-        new ActionItem(R.drawable.ic_close_purple_light, R.drawable.ic_close_light),
-        new ActionItem(R.drawable.ic_add_purple_light, R.drawable.ic_add_light),
-        new ActionItem(R.drawable.ic_check_purple_light, R.drawable.ic_check_light)
+        new ActionItem(R.drawable.ic_close_selected, R.drawable.ic_close_light),
+        new ActionItem(R.drawable.ic_github_selected, R.drawable.ic_github),
+        new ActionItem(R.drawable.ic_pull_request_selected, R.drawable.ic_pull_request)
     ));
 
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
