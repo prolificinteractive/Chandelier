@@ -18,10 +18,8 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:layout_below="@id/toolbar"
-      android:elevation="@dimen/elevation"
       app:al_background="?attr/colorPrimary"
       >
-
     <include layout="@layout/content_recycler_view" />
   </com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout>
 

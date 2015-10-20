@@ -8,6 +8,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
@@ -86,18 +87,17 @@ public class ActionLayout extends FrameLayout {
 
   public ActionLayout(final Context context, final AttributeSet attrs) {
     super(context);
-    Resources res = getResources();
-    setMinimumHeight(200);
+    final Resources res = getResources();
     final TypedArray a = context.getTheme().obtainStyledAttributes(
         attrs,
         R.styleable.SwipeActionLayout,
         0, 0);
 
     // Defaults
-    int defaultElevation = res.getDimensionPixelSize(R.dimen.default_elevation);
-    int defaultSelectorMargin = res.getDimensionPixelSize(R.dimen.default_selector_margin);
-    int defaultSelectorSize = res.getDimensionPixelSize(R.dimen.default_selector_size);
-    boolean defaultScaleEnabled = res.getBoolean(R.bool.default_scale_enabled);
+    final int defaultElevation = res.getDimensionPixelSize(R.dimen.default_elevation);
+    final int defaultSelectorMargin = res.getDimensionPixelSize(R.dimen.default_selector_margin);
+    final int defaultSelectorSize = res.getDimensionPixelSize(R.dimen.default_selector_size);
+    final boolean defaultScaleEnabled = res.getBoolean(R.bool.default_scale_enabled);
 
     isScaleEnabled = a.getBoolean(R.styleable.SwipeActionLayout_al_scale_enabled,
         defaultScaleEnabled);
@@ -135,6 +135,15 @@ public class ActionLayout extends FrameLayout {
       selectedImageView.setBackground(selectorBackground);
     } else {
       selectedImageView.setBackground(res.getDrawable(R.drawable.default_selector));
+    }
+
+    Drawable layoutBackground = a.getDrawable(R.styleable.SwipeActionLayout_al_background);
+    if (layoutBackground != null) {
+      setBackground(layoutBackground);
+    } else {
+      TypedValue typedValue = new TypedValue();
+      context.getTheme().resolveAttribute(R.attr.colorPrimary, typedValue, true);
+      setBackgroundColor(typedValue.data);
     }
 
     addView(selectedImageView);

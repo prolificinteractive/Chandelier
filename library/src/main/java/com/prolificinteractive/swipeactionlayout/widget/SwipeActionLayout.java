@@ -1,7 +1,9 @@
 package com.prolificinteractive.swipeactionlayout.widget;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.NestedScrollingChild;
@@ -10,6 +12,7 @@ import android.support.v4.view.NestedScrollingParent;
 import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.NestedScrollView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -21,6 +24,7 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
 import android.widget.AbsListView;
+import com.prolificinteractive.swipeactionlayout.R;
 import java.util.List;
 
 public class SwipeActionLayout extends ViewGroup
@@ -113,6 +117,10 @@ public class SwipeActionLayout extends ViewGroup
     super(context, attrs);
     this.mAttrs = attrs;
 
+    final Resources res = getResources();
+    // Defaults
+    final int defaultElevation = res.getDimensionPixelSize(R.dimen.default_elevation);
+
     mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
     setWillNotDraw(false);
@@ -120,6 +128,12 @@ public class SwipeActionLayout extends ViewGroup
 
     final TypedArray a = context.obtainStyledAttributes(attrs, LAYOUT_ATTRS);
     setEnabled(a.getBoolean(0, true));
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      setElevation(
+          a.getDimensionPixelSize(R.styleable.SwipeActionLayout_al_elevation, defaultElevation));
+    }
+
     a.recycle();
 
     createProgressView();
@@ -161,7 +175,8 @@ public class SwipeActionLayout extends ViewGroup
     if (mAbsListView == null) {
       for (int i = 0; i < getChildCount(); i++) {
         final View child = getChildAt(i);
-        if (child instanceof ScrollingView) {
+        if (child instanceof ScrollingView || child instanceof NestedScrollView) {
+          // TODO fix validation
           mAbsListView = child;
           break;
         }
