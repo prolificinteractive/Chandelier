@@ -6,10 +6,6 @@ import android.content.res.TypedArray;
 import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
-import android.support.v4.view.NestedScrollingChild;
-import android.support.v4.view.NestedScrollingChildHelper;
-import android.support.v4.view.NestedScrollingParent;
-import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
@@ -33,15 +29,19 @@ import java.util.List;
 public class SwipeActionLayout extends ViewGroup {
   private static final String LOG_TAG = SwipeActionLayout.class.getSimpleName();
 
-  private static final int MAX_ALPHA = 255;
-  private static final int STARTING_PROGRESS_ALPHA = (int) (.3f * MAX_ALPHA);
   private static final float DECELERATE_INTERPOLATION_FACTOR = 2f;
   private static final int INVALID_POINTER = -1;
   private static final float DRAG_RATE = .8f;
-  private static final int ALPHA_ANIMATION_DURATION = 300;
   private static final int ANIMATE_TO_START_DURATION = 300;
+  private static final int[] LAYOUT_ATTRS = new int[] {
+      android.R.attr.enabled
+  };
 
   private final AttributeSet mAttrs;
+  private final DecelerateInterpolator mDecelerateInterpolator;
+
+  protected int mFrom;
+  protected int mOriginalOffsetTop;
 
   private boolean mActionSelected;
   private View mAbsListView;
@@ -49,23 +49,19 @@ public class SwipeActionLayout extends ViewGroup {
   private OnActionListener mListener;
   private int mTouchSlop;
   private float mTotalDragDistance = -1;
-
   private int mCurrentTargetOffsetTop;
   // Whether or not the starting offset has been determined.
   private boolean mOriginalOffsetCalculated = false;
-
   private float mInitialMotionY;
   private float mInitialDownY;
   private boolean mIsBeingDragged;
   private int mActivePointerId = INVALID_POINTER;
-
   // Target is returning to its start offset because it was cancelled or a
   // refresh was triggered.
   private boolean mReturningToStart;
-  private final DecelerateInterpolator mDecelerateInterpolator;
-  private static final int[] LAYOUT_ATTRS = new int[] {
-      android.R.attr.enabled
-  };
+  private ActionLayout mActionLayout;
+  private float mSpinnerFinalOffset;
+  private IdleScrollListener scrollListener = new IdleScrollListener();
 
   private final AnimationListener mMoveToStartListener = new SimpleAnimationListener() {
     @Override public void onAnimationEnd(Animation animation) {
@@ -77,21 +73,12 @@ public class SwipeActionLayout extends ViewGroup {
     }
   };
 
-  private ActionLayout mActionLayout;
-
-  protected int mFrom;
-
-  protected int mOriginalOffsetTop;
-
-  private Animation mAlphaStartAnimation;
-
-  private Animation mAlphaMaxAnimation;
-
-  private float mSpinnerFinalOffset;
-
-  private int mAlpha;
-
-  private IdleScrollListener scrollListener = new IdleScrollListener();
+  private final Animation mAnimateToStartPosition = new Animation() {
+    @Override
+    public void applyTransformation(float interpolatedTime, Transformation t) {
+      moveToStart(interpolatedTime);
+    }
+  };
 
   /**
    * Simple constructor to use when creating a SwipeRefreshLayout from code.
@@ -292,7 +279,6 @@ public class SwipeActionLayout extends ViewGroup {
         if (yDiff > mTouchSlop && !mIsBeingDragged) {
           mInitialMotionY = mInitialDownY + mTouchSlop;
           mIsBeingDragged = true;
-          mAlpha = STARTING_PROGRESS_ALPHA;
         }
         break;
 
@@ -443,13 +429,6 @@ public class SwipeActionLayout extends ViewGroup {
   private void moveToStart(float interpolatedTime) {
     setTargetOffsetTopAndBottom(Math.round((1 - interpolatedTime) * mFrom));
   }
-
-  private final Animation mAnimateToStartPosition = new Animation() {
-    @Override
-    public void applyTransformation(float interpolatedTime, Transformation t) {
-      moveToStart(interpolatedTime);
-    }
-  };
 
   private void setTargetOffsetTopAndBottom(final int offset) {
     ViewCompat.setTranslationY(mActionLayout, offset);

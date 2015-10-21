@@ -1,23 +1,26 @@
 package com.prolificinteractive.swipeactionlayout.widget;
 
-import android.animation.Animator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.annotation.Nullable;
+import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
+import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
+import android.view.animation.Transformation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import com.prolificinteractive.swipeactionlayout.R;
-import com.prolificinteractive.swipeactionlayout.listener.SimpleAnimatorListener;
+import com.prolificinteractive.swipeactionlayout.listener.SimpleAnimationListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,12 +57,12 @@ public class ActionLayout extends FrameLayout {
   private int selectedIndex = -1;
   private boolean isAnimating = false;
 
-  private final Animator.AnimatorListener animatorListener = new SimpleAnimatorListener() {
-    @Override public void onAnimationStart(Animator animation) {
+  private final Animation.AnimationListener animationListener = new SimpleAnimationListener() {
+    @Override public void onAnimationStart(Animation animation) {
       updateSelectedImageView();
     }
 
-    @Override public void onAnimationEnd(Animator animation) {
+    @Override public void onAnimationEnd(Animation animation) {
       isAnimating = false;
       if (actionListener != null) {
         actionListener.onAnimationEnd(null);
@@ -273,11 +276,23 @@ public class ActionLayout extends FrameLayout {
     final int iW = measuredWidth / actionItems.size();
     final int target = iW * selectedIndex + (iW - selectedSize) / 2;
     isAnimating = true;
-    selectedImageView.animate()
-        .scaleX(DEFAULT_SCALE)
-        .translationX(target)
-        .setInterpolator(ACCELERATE_DECELERATE_INTERPOLATOR)
-        .setListener(animatorListener);
+
+    final float currentScale = selectedImageView.getScaleX();
+    final float currentTranslation = selectedImageView.getTranslationX();
+
+    Animation animation = new Animation() {
+      @Override protected void applyTransformation(float t, Transformation transformation) {
+        ViewCompat.setScaleX(selectedImageView, (DEFAULT_SCALE - currentScale) * t + currentScale);
+        float dx = (target - currentTranslation) * t + currentTranslation;
+        ViewCompat.setTranslationX(selectedImageView, dx);
+      }
+    };
+
+    animation.setAnimationListener(animationListener);
+    animation.setDuration(300);
+    animation.setInterpolator(ACCELERATE_DECELERATE_INTERPOLATOR);
+    selectedImageView.clearAnimation();
+    selectedImageView.startAnimation(animation);
   }
 
   private int getInRange(final int value, final int min, final int max) {
