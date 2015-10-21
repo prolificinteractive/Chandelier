@@ -13,6 +13,7 @@ import android.support.v4.view.NestedScrollingParentHelper;
 import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.NestedScrollView;
+import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -25,10 +26,11 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
 import android.widget.AbsListView;
 import com.prolificinteractive.swipeactionlayout.R;
+import com.prolificinteractive.swipeactionlayout.listener.IdleScrollListener;
+import com.prolificinteractive.swipeactionlayout.listener.SimpleAnimationListener;
 import java.util.List;
 
-public class SwipeActionLayout extends ViewGroup
-    implements NestedScrollingParent, NestedScrollingChild {
+public class SwipeActionLayout extends ViewGroup {
   private static final String LOG_TAG = SwipeActionLayout.class.getSimpleName();
 
   private static final int MAX_ALPHA = 255;
@@ -47,13 +49,6 @@ public class SwipeActionLayout extends ViewGroup
   private OnActionListener mListener;
   private int mTouchSlop;
   private float mTotalDragDistance = -1;
-  // If nested scrolling is enabled, the total amount that needed to be
-  // consumed by this as the nested scrolling parent is used in place of the
-  // overscroll determined by MOVE events in the onTouch handler
-  private float mTotalUnconsumed;
-  private final NestedScrollingParentHelper mNestedScrollingParentHelper;
-  private final NestedScrollingChildHelper mNestedScrollingChildHelper;
-  private final int[] mParentScrollConsumed = new int[2];
 
   private int mCurrentTargetOffsetTop;
   // Whether or not the starting offset has been determined.
@@ -72,20 +67,12 @@ public class SwipeActionLayout extends ViewGroup
       android.R.attr.enabled
   };
 
-  private final AnimationListener mMoveToStartListener = new AnimationListener() {
-    @Override public void onAnimationStart(Animation animation) {
-
-    }
-
+  private final AnimationListener mMoveToStartListener = new SimpleAnimationListener() {
     @Override public void onAnimationEnd(Animation animation) {
       if (mActionSelected) {
         mListener.onActionSelected(mActionLayout.getSelectedIndex());
         mActionSelected = false;
       }
-    }
-
-    @Override public void onAnimationRepeat(Animation animation) {
-
     }
   };
 
@@ -102,6 +89,8 @@ public class SwipeActionLayout extends ViewGroup
   private float mSpinnerFinalOffset;
 
   private int mAlpha;
+
+  private IdleScrollListener scrollListener = new IdleScrollListener();
 
   /**
    * Simple constructor to use when creating a SwipeRefreshLayout from code.
@@ -138,11 +127,6 @@ public class SwipeActionLayout extends ViewGroup
 
     createProgressView();
     ViewCompat.setChildrenDrawingOrderEnabled(this, true);
-    // the absolute offset has to take into account that the circle starts at an offset
-    mNestedScrollingParentHelper = new NestedScrollingParentHelper(this);
-
-    mNestedScrollingChildHelper = new NestedScrollingChildHelper(this);
-    setNestedScrollingEnabled(true);
   }
 
   private void createProgressView() {
@@ -178,6 +162,12 @@ public class SwipeActionLayout extends ViewGroup
         if (child instanceof ScrollingView || child instanceof NestedScrollView) {
           // TODO fix validation
           mAbsListView = child;
+          scrollListener.setParent(mAbsListView);
+          if (mAbsListView instanceof AbsListView) {
+            ((AbsListView) mAbsListView).setOnScrollListener(scrollListener);
+          } else if (mAbsListView instanceof RecyclerView) {
+            ((RecyclerView) mAbsListView).addOnScrollListener(scrollListener);
+          }
           break;
         }
       }
@@ -338,137 +328,6 @@ public class SwipeActionLayout extends ViewGroup
     }
   }
 
-  // NestedScrollingParent
-
-  @Override
-  public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
-    if (isEnabled() && (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0) {
-      // Dispatch up to the nested parent
-      startNestedScroll(nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL);
-      return true;
-    }
-    return false;
-  }
-
-  @Override
-  public void onNestedScrollAccepted(View child, View target, int axes) {
-    // Reset the counter of how much leftover scroll needs to be consumed.
-    mNestedScrollingParentHelper.onNestedScrollAccepted(child, target, axes);
-    mTotalUnconsumed = 0;
-  }
-
-  @Override
-  public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
-    // If we are in the middle of consuming, a scroll, then we want to move the spinner back up
-    // before allowing the list to scroll
-    if (dy > 0 && mTotalUnconsumed > 0) {
-      if (dy > mTotalUnconsumed) {
-        consumed[1] = dy - (int) mTotalUnconsumed;
-        mTotalUnconsumed = 0;
-      } else {
-        mTotalUnconsumed -= dy;
-        consumed[1] = dy;
-      }
-      moveActionLayout(mTotalUnconsumed);
-    }
-
-    // Now let our nested parent consume the leftovers
-    final int[] parentConsumed = mParentScrollConsumed;
-    if (dispatchNestedPreScroll(dx - consumed[0], dy - consumed[1], parentConsumed, null)) {
-      consumed[0] += parentConsumed[0];
-      consumed[1] += parentConsumed[1];
-    }
-  }
-
-  @Override
-  public int getNestedScrollAxes() {
-    return mNestedScrollingParentHelper.getNestedScrollAxes();
-  }
-
-  @Override
-  public void onStopNestedScroll(View target) {
-    mNestedScrollingParentHelper.onStopNestedScroll(target);
-    // Finish the spinner for nested scrolling if we ever consumed any
-    // unconsumed nested scroll
-    if (mTotalUnconsumed > 0) {
-      finishAction(mTotalUnconsumed);
-      mTotalUnconsumed = 0;
-    }
-    // Dispatch up our nested parent
-    stopNestedScroll();
-  }
-
-  @Override
-  public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed,
-      int dyUnconsumed) {
-    if (dyUnconsumed < 0) {
-      dyUnconsumed = Math.abs(dyUnconsumed);
-      mTotalUnconsumed += dyUnconsumed;
-      moveActionLayout(mTotalUnconsumed);
-    }
-    // Dispatch up to the nested parent
-    dispatchNestedScroll(dxConsumed, dyConsumed, dxUnconsumed, dxConsumed, null);
-  }
-
-  // NestedScrollingChild
-
-  @Override
-  public boolean onNestedPreFling(View target, float velocityX, float velocityY) {
-    return false;
-  }
-
-  @Override
-  public boolean onNestedFling(View target, float velocityX, float velocityY, boolean consumed) {
-    return false;
-  }
-
-  @Override
-  public void setNestedScrollingEnabled(boolean enabled) {
-    mNestedScrollingChildHelper.setNestedScrollingEnabled(enabled);
-  }
-
-  @Override
-  public boolean isNestedScrollingEnabled() {
-    return mNestedScrollingChildHelper.isNestedScrollingEnabled();
-  }
-
-  @Override
-  public boolean startNestedScroll(int axes) {
-    return mNestedScrollingChildHelper.startNestedScroll(axes);
-  }
-
-  @Override
-  public void stopNestedScroll() {
-    mNestedScrollingChildHelper.stopNestedScroll();
-  }
-
-  @Override
-  public boolean hasNestedScrollingParent() {
-    return mNestedScrollingChildHelper.hasNestedScrollingParent();
-  }
-
-  @Override
-  public boolean dispatchNestedScroll(int dxConsumed, int dyConsumed, int dxUnconsumed,
-      int dyUnconsumed, int[] offsetInWindow) {
-    return mNestedScrollingChildHelper.dispatchNestedScroll(dxConsumed, dyConsumed,
-        dxUnconsumed, dyUnconsumed, offsetInWindow);
-  }
-
-  @Override
-  public boolean dispatchNestedPreScroll(int dx, int dy, int[] consumed, int[] offsetInWindow) {
-    return mNestedScrollingChildHelper.dispatchNestedPreScroll(dx, dy, consumed, offsetInWindow);
-  }
-
-  @Override
-  public boolean dispatchNestedFling(float velocityX, float velocityY, boolean consumed) {
-    return mNestedScrollingChildHelper.dispatchNestedFling(velocityX, velocityY, consumed);
-  }
-
-  @Override
-  public boolean dispatchNestedPreFling(float velocityX, float velocityY) {
-    return mNestedScrollingChildHelper.dispatchNestedPreFling(velocityX, velocityY);
-  }
-
   private boolean isAnimationRunning(Animation animation) {
     return animation != null && animation.hasStarted() && !animation.hasEnded();
   }
@@ -488,17 +347,9 @@ public class SwipeActionLayout extends ViewGroup
   private void finishAction(final float overscrollTop) {
     mActionSelected = overscrollTop > mTotalDragDistance;
     if (mActionSelected) {
-      mActionLayout.finishAction(new AnimationListener() {
-        @Override public void onAnimationStart(Animation animation) {
-
-        }
-
+      mActionLayout.finishAction(new SimpleAnimationListener() {
         @Override public void onAnimationEnd(Animation animation) {
           animateOffsetToStartPosition();
-        }
-
-        @Override public void onAnimationRepeat(Animation animation) {
-
         }
       });
     } else {
@@ -514,7 +365,7 @@ public class SwipeActionLayout extends ViewGroup
       mReturningToStart = false;
     }
 
-    if (!isEnabled() || mReturningToStart || canChildScrollUp()) {
+    if (!isEnabled() || mReturningToStart || canChildScrollUp() || !scrollListener.isIdle()) {
       // Fail fast if we're not in a state where a swipe is possible
       return false;
     }

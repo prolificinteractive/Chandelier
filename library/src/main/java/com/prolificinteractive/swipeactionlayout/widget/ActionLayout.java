@@ -17,6 +17,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import com.prolificinteractive.swipeactionlayout.R;
+import com.prolificinteractive.swipeactionlayout.listener.SimpleAnimatorListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +54,7 @@ public class ActionLayout extends FrameLayout {
   private int selectedIndex = -1;
   private boolean isAnimating = false;
 
-  private final Animator.AnimatorListener animatorListener = new Animator.AnimatorListener() {
+  private final Animator.AnimatorListener animatorListener = new SimpleAnimatorListener() {
     @Override public void onAnimationStart(Animator animation) {
       updateSelectedImageView();
     }
@@ -64,14 +65,6 @@ public class ActionLayout extends FrameLayout {
         actionListener.onAnimationEnd(null);
       }
       actionListener = null;
-    }
-
-    @Override public void onAnimationCancel(Animator animation) {
-
-    }
-
-    @Override public void onAnimationRepeat(Animator animation) {
-
     }
   };
 

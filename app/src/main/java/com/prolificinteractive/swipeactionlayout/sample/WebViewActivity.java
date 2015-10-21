@@ -26,6 +26,7 @@ public class WebViewActivity extends AppCompatActivity {
 
     WebView webView = (WebView) findViewById(R.id.web_view);
     webView.setWebViewClient(new WebViewClient());
+    webView.getSettings().setJavaScriptEnabled(true);
     webView.loadUrl("https://www.github.com/");
 
     swipeActionLayout = (SwipeActionLayout) findViewById(R.id.swipe_action_layout);
