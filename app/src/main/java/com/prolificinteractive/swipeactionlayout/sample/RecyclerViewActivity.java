@@ -1,4 +1,4 @@
-package com.prolificinteractive.swipeactionlayout;
+package com.prolificinteractive.swipeactionlayout.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,13 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.prolificinteractive.swipeactionlayout.widget.ActionLayout;
+import com.prolificinteractive.swipeactionlayout.widget.ActionItem;
 import com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout;
 import java.util.Arrays;
 
-public class MainActivity extends AppCompatActivity {
-
-  private static final Integer LOCK = 0;
+public class RecyclerViewActivity extends AppCompatActivity {
 
   private SwipeActionLayout swipeActionLayout;
   private RecyclerView list;
@@ -28,15 +26,15 @@ public class MainActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    setContentView(R.layout.activity_main);
+    setContentView(R.layout.activity_recycler_view);
 
     final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 
     swipeActionLayout = (SwipeActionLayout) findViewById(R.id.swipe_action_layout);
     swipeActionLayout.setOnActionSelectedListener(new SwipeActionLayout.OnActionListener() {
-      @Override public void onActionSelected(int index) {
-        Toast.makeText(MainActivity.this, index + "", Toast.LENGTH_SHORT).show();
+      @Override public void onActionSelected(int index, ActionItem action) {
+        Toast.makeText(RecyclerViewActivity.this, index + "", Toast.LENGTH_SHORT).show();
       }
     });
 
@@ -46,9 +44,9 @@ public class MainActivity extends AppCompatActivity {
     list.setAdapter(adapter);
 
     swipeActionLayout.populateActionItems(Arrays.asList(
-        new ActionLayout.ActionItem(R.drawable.ic_close_purple_light, R.drawable.ic_close_light),
-        new ActionLayout.ActionItem(R.drawable.ic_add_purple_light, R.drawable.ic_add_light),
-        new ActionLayout.ActionItem(R.drawable.ic_check_purple_light, R.drawable.ic_check_light)
+        new ActionItem(R.drawable.ic_close),
+        new ActionItem(R.drawable.ic_add),
+        new ActionItem(R.drawable.ic_check)
     ));
   }
 
@@ -84,8 +82,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBindViewHolder(DummyViewHolder holder, int position) {
-      holder.title.setText("Title " + position);
-      holder.subtitle.setText("Subtitle " + position);
+      holder.title.setText(String.format("Title %d", position));
+      holder.subtitle.setText(String.format("Subtitle %d", position));
     }
 
     @Override

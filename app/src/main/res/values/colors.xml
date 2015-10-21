@@ -3,4 +3,10 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <color name="githubPrimary">#666666</color>
+    <color name="githubPrimaryDark">#333333</color>
+    <color name="githubAccent">#4183c4</color>
+    <color name="githubUnselected">@color/githubPrimaryDark</color>
+    <color name="githubSelector">@color/githubAccent</color>
 </resources>
