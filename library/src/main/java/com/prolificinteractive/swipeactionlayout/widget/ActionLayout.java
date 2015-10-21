@@ -143,7 +143,7 @@ public class ActionLayout extends FrameLayout {
     addView(container);
   }
 
-  public void populateActionItems(@Nullable final List<ActionItem> items) {
+  public void populateActionItems(@Nullable final List<? extends ActionItem> items) {
     container.removeAllViews();
     actionItems.clear();
     imageViews.clear();
@@ -299,5 +299,9 @@ public class ActionLayout extends FrameLayout {
 
   public void onLayoutTranslated(final float progress) {
 
+  }
+
+  public ActionItem getActionItem(int index) {
+    return actionItems.get(index);
   }
 }

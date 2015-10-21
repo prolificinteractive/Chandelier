@@ -17,4 +17,8 @@ public class ActionItem {
     this.selectedResId = selectedDrawableResId;
     this.unselectedResId = unselectedDrawableResId;
   }
+
+  public void execute() {
+
+  }
 }

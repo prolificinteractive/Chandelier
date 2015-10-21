@@ -33,7 +33,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
 
     swipeActionLayout = (SwipeActionLayout) findViewById(R.id.swipe_action_layout);
     swipeActionLayout.setOnActionSelectedListener(new SwipeActionLayout.OnActionListener() {
-      @Override public void onActionSelected(int index) {
+      @Override public void onActionSelected(int index, ActionItem action) {
         Toast.makeText(RecyclerViewActivity.this, index + "", Toast.LENGTH_SHORT).show();
       }
     });

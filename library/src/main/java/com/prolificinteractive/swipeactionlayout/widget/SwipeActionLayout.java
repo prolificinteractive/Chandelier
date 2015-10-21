@@ -70,7 +70,8 @@ public class SwipeActionLayout extends ViewGroup {
   private final AnimationListener mMoveToStartListener = new SimpleAnimationListener() {
     @Override public void onAnimationEnd(Animation animation) {
       if (mActionSelected) {
-        mListener.onActionSelected(mActionLayout.getSelectedIndex());
+        int selectedIndex = mActionLayout.getSelectedIndex();
+        mListener.onActionSelected(selectedIndex, mActionLayout.getActionItem(selectedIndex));
         mActionSelected = false;
       }
     }
@@ -467,7 +468,7 @@ public class SwipeActionLayout extends ViewGroup {
     }
   }
 
-  public void populateActionItems(@Nullable final List<ActionItem> items) {
+  public void populateActionItems(@Nullable final List<? extends ActionItem> items) {
     mActionLayout.populateActionItems(items);
   }
 
@@ -476,6 +477,6 @@ public class SwipeActionLayout extends ViewGroup {
    * triggers an action should implement this interface.
    */
   public interface OnActionListener {
-    void onActionSelected(int index);
+    void onActionSelected(int index, ActionItem action);
   }
 }
