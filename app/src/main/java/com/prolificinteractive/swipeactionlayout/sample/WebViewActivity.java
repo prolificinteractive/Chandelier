@@ -44,20 +44,17 @@ public class WebViewActivity extends AppCompatActivity {
     });
     swipeActionLayout.populateActionItems(Arrays.asList(
         new GitHubAction.Builder()
-            .setSelectedDrawableResId(R.drawable.ic_notifications)
-            .setUnselectedDrawableResId(R.drawable.ic_notifications_unselected)
+            .setDrawableResId(R.drawable.ic_notifications)
             .setUrl(GITHUB_NOTIFICATIONS_URL)
             .setWebView(webView)
             .build(),
         new GitHubAction.Builder()
-            .setSelectedDrawableResId(R.drawable.ic_github)
-            .setUnselectedDrawableResId(R.drawable.ic_github_unselected)
+            .setDrawableResId(R.drawable.ic_github)
             .setUrl(GITHUB_URL)
             .setWebView(webView)
             .build(),
         new GitHubAction.Builder()
-            .setSelectedDrawableResId(R.drawable.ic_pull_request)
-            .setUnselectedDrawableResId(R.drawable.ic_pull_request_unselected)
+            .setDrawableResId(R.drawable.ic_pull_request)
             .setUrl(GITHUB_PULLS_URL)
             .setWebView(webView)
             .build()
@@ -76,9 +73,8 @@ public class WebViewActivity extends AppCompatActivity {
     private String url;
     private WebView webView;
 
-    public GitHubAction(@DrawableRes int selectedDrawableResId,
-        @DrawableRes int unselectedDrawableResId) {
-      super(selectedDrawableResId, unselectedDrawableResId);
+    public GitHubAction(@DrawableRes int drawableResId) {
+      super(drawableResId);
     }
 
     @Override public void execute() {
@@ -97,17 +93,11 @@ public class WebViewActivity extends AppCompatActivity {
 
     static class Builder {
       String url = "";
-      int selectedDrawableResId;
-      int unselectedDrawableResId;
+      int drawableResId;
       WebView webView;
 
-      public Builder setSelectedDrawableResId(@DrawableRes int resId) {
-        selectedDrawableResId = resId;
-        return this;
-      }
-
-      public Builder setUnselectedDrawableResId(@DrawableRes int resId) {
-        unselectedDrawableResId = resId;
+      public Builder setDrawableResId(@DrawableRes int resId) {
+        drawableResId = resId;
         return this;
       }
 
@@ -125,7 +115,7 @@ public class WebViewActivity extends AppCompatActivity {
         if (url == null || webView == null) {
           throw new IllegalArgumentException("URL and WebView must be set");
         }
-        GitHubAction action = new GitHubAction(selectedDrawableResId, unselectedDrawableResId);
+        GitHubAction action = new GitHubAction(drawableResId);
         action.setUrl(url);
         action.setWebView(webView);
         return action;

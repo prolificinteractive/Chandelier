@@ -8,10 +8,8 @@ import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
@@ -59,7 +57,7 @@ public class ActionLayout extends FrameLayout {
 
   private final Animation.AnimationListener animationListener = new SimpleAnimationListener() {
     @Override public void onAnimationStart(Animation animation) {
-      updateSelectedImageView();
+      imageViews.get(selectedIndex).setSelected(true);
     }
 
     @Override public void onAnimationEnd(Animation animation) {
@@ -71,15 +69,9 @@ public class ActionLayout extends FrameLayout {
     }
   };
 
-  private void updateSelectedImageView() {
-    for (int i = 0; i < actionItems.size(); i++) {
-      imageViews.get(i).setBackgroundResource(actionItems.get(i).unselectedResId);
-    }
-    imageViews.get(selectedIndex)
-        .setBackgroundResource(actionItems.get(selectedIndex).selectedResId);
-  }
-
   private Animation.AnimationListener actionListener;
+  private final int shortAnimDuration =
+      getResources().getInteger(android.R.integer.config_shortAnimTime);
 
   public ActionLayout(final Context context, final AttributeSet attrs) {
     super(context);
@@ -146,6 +138,10 @@ public class ActionLayout extends FrameLayout {
     addView(container);
   }
 
+  public void pop(int... drawables) {
+
+  }
+
   public void populateActionItems(@Nullable final List<? extends ActionItem> items) {
     container.removeAllViews();
     actionItems.clear();
@@ -170,7 +166,7 @@ public class ActionLayout extends FrameLayout {
         );
         imageLp.setMargins(imageViewMargin, imageViewMargin, imageViewMargin, imageViewMargin);
         imageView.setLayoutParams(imageLp);
-        imageView.setBackgroundResource(item.unselectedResId);
+        imageView.setBackgroundResource(item.drawableResId);
 
         imageViews.add(imageView);
 
@@ -178,7 +174,7 @@ public class ActionLayout extends FrameLayout {
         container.addView(frame);
       }
       selectedIndex = actionItems.size() / 2;
-      updateSelectedImageView();
+      imageViews.get(selectedIndex).setSelected(true);
     }
   }
 
@@ -272,6 +268,9 @@ public class ActionLayout extends FrameLayout {
   }
 
   private void setSelectedIndex(final int newSelectedIndex) {
+    // Unselect old index
+    imageViews.get(selectedIndex).setSelected(false);
+
     selectedIndex = newSelectedIndex;
     final int iW = measuredWidth / actionItems.size();
     final int target = iW * selectedIndex + (iW - selectedSize) / 2;
@@ -280,16 +279,16 @@ public class ActionLayout extends FrameLayout {
     final float currentScale = selectedImageView.getScaleX();
     final float currentTranslation = selectedImageView.getTranslationX();
 
-    Animation animation = new Animation() {
+    final Animation animation = new Animation() {
       @Override protected void applyTransformation(float t, Transformation transformation) {
         ViewCompat.setScaleX(selectedImageView, (DEFAULT_SCALE - currentScale) * t + currentScale);
-        float dx = (target - currentTranslation) * t + currentTranslation;
-        ViewCompat.setTranslationX(selectedImageView, dx);
+        ViewCompat.setTranslationX(selectedImageView,
+            (target - currentTranslation) * t + currentTranslation);
       }
     };
 
     animation.setAnimationListener(animationListener);
-    animation.setDuration(300);
+    animation.setDuration(shortAnimDuration);
     animation.setInterpolator(ACCELERATE_DECELERATE_INTERPOLATOR);
     selectedImageView.clearAnimation();
     selectedImageView.startAnimation(animation);

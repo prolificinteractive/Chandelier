@@ -44,9 +44,9 @@ public class RecyclerViewActivity extends AppCompatActivity {
     list.setAdapter(adapter);
 
     swipeActionLayout.populateActionItems(Arrays.asList(
-        new ActionItem(R.drawable.ic_close_purple_light, R.drawable.ic_close_light),
-        new ActionItem(R.drawable.ic_add_purple_light, R.drawable.ic_add_light),
-        new ActionItem(R.drawable.ic_check_purple_light, R.drawable.ic_check_light)
+        new ActionItem(R.drawable.ic_close),
+        new ActionItem(R.drawable.ic_add),
+        new ActionItem(R.drawable.ic_check)
     ));
   }
 
