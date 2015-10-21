@@ -44,20 +44,20 @@ public class WebViewActivity extends AppCompatActivity {
     });
     swipeActionLayout.populateActionItems(Arrays.asList(
         new GitHubAction.Builder()
-            .setSelectedDrawableResId(R.drawable.ic_notifications_selected)
-            .setUnselectedDrawableResId(R.drawable.ic_notifications_white)
+            .setSelectedDrawableResId(R.drawable.ic_notifications)
+            .setUnselectedDrawableResId(R.drawable.ic_notifications_unselected)
             .setUrl(GITHUB_NOTIFICATIONS_URL)
             .setWebView(webView)
             .build(),
         new GitHubAction.Builder()
-            .setSelectedDrawableResId(R.drawable.ic_github_selected)
-            .setUnselectedDrawableResId(R.drawable.ic_github)
+            .setSelectedDrawableResId(R.drawable.ic_github)
+            .setUnselectedDrawableResId(R.drawable.ic_github_unselected)
             .setUrl(GITHUB_URL)
             .setWebView(webView)
             .build(),
         new GitHubAction.Builder()
-            .setSelectedDrawableResId(R.drawable.ic_pull_request_selected)
-            .setUnselectedDrawableResId(R.drawable.ic_pull_request)
+            .setSelectedDrawableResId(R.drawable.ic_pull_request)
+            .setUnselectedDrawableResId(R.drawable.ic_pull_request_unselected)
             .setUrl(GITHUB_PULLS_URL)
             .setWebView(webView)
             .build()

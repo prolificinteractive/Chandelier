@@ -18,9 +18,9 @@
   <style name="GitHubTheme"
       parent="Theme.AppCompat.Light.DarkActionBar">
     <!-- Customize your theme here. -->
-    <item name="colorPrimary">@color/colorPrimary</item>
-    <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-    <item name="colorAccent">@color/colorAccent</item>
+    <item name="colorPrimary">@color/githubPrimary</item>
+    <item name="colorPrimaryDark">@color/githubPrimaryDark</item>
+    <item name="colorAccent">@color/githubAccent</item>
   </style>
 
   <style name="GitHubTheme.NoActionBar">

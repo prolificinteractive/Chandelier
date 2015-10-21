@@ -27,6 +27,7 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         app:al_selected_size="40dp"
+        app:al_selector="@drawable/al_github_selector"
         >
         <android.support.v4.widget.NestedScrollView
             android:layout_width="wrap_content"
