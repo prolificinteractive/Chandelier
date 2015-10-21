@@ -22,8 +22,6 @@ import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
 import android.widget.AbsListView;
 import com.prolificinteractive.swipeactionlayout.R;
-import com.prolificinteractive.swipeactionlayout.listener.IdleScrollListener;
-import com.prolificinteractive.swipeactionlayout.listener.SimpleAnimationListener;
 import java.util.List;
 
 public class SwipeActionLayout extends ViewGroup {

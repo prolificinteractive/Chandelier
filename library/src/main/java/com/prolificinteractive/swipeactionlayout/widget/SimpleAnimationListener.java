@@ -1,8 +1,8 @@
-package com.prolificinteractive.swipeactionlayout.listener;
+package com.prolificinteractive.swipeactionlayout.widget;
 
 import android.view.animation.Animation;
 
-public class SimpleAnimationListener implements Animation.AnimationListener {
+class SimpleAnimationListener implements Animation.AnimationListener {
   @Override public void onAnimationStart(Animation animation) {
 
   }

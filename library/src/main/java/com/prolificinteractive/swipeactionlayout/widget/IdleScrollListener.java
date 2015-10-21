@@ -1,11 +1,10 @@
-package com.prolificinteractive.swipeactionlayout.listener;
+package com.prolificinteractive.swipeactionlayout.widget;
 
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
 import android.widget.AbsListView;
 
-public class IdleScrollListener extends RecyclerView.OnScrollListener implements AbsListView.OnScrollListener {
+class IdleScrollListener extends RecyclerView.OnScrollListener implements AbsListView.OnScrollListener {
   Class parentType;
   int scrollState;
 

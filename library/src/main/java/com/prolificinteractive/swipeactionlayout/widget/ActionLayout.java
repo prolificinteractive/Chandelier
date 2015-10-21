@@ -18,7 +18,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import com.prolificinteractive.swipeactionlayout.R;
-import com.prolificinteractive.swipeactionlayout.listener.SimpleAnimationListener;
+import com.prolificinteractive.swipeactionlayout.widget.listener.SimpleAnimationListener;
 import java.util.ArrayList;
 import java.util.List;
 
