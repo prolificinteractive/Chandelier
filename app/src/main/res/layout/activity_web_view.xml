@@ -37,6 +37,15 @@
         </android.support.v4.widget.NestedScrollView>
     </com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout>
 
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_marginTop="-7dp"
+        android:elevation="4dp"
+        android:max="100"
+        />
   <android.support.design.widget.FloatingActionButton
       android:id="@+id/fab"
       android:layout_width="wrap_content"

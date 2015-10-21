@@ -8,8 +8,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 import com.prolificinteractive.swipeactionlayout.widget.ActionItem;
 import com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout;
 import java.util.Arrays;
@@ -31,9 +33,22 @@ public class WebViewActivity extends AppCompatActivity {
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 
+    final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+
     webView = (WebView) findViewById(R.id.web_view);
     webView.setWebViewClient(new WebViewClient());
     webView.getSettings().setJavaScriptEnabled(true);
+    webView.setWebChromeClient(new WebChromeClient() {
+      @Override public void onProgressChanged(WebView view, int newProgress) {
+        if (newProgress == 100) {
+          progressBar.setVisibility(View.INVISIBLE);
+        } else {
+          progressBar.setVisibility(View.VISIBLE);
+        }
+
+        progressBar.setProgress(newProgress);
+      }
+    });
     webView.loadUrl(GITHUB_URL);
 
     swipeActionLayout = (SwipeActionLayout) findViewById(R.id.swipe_action_layout);
