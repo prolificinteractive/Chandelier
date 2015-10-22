@@ -61,7 +61,7 @@ public class SwipeActionLayout extends ViewGroup {
   private float spinnerFinalOffset;
   private IdleScrollListener scrollListener = new IdleScrollListener();
 
-  private final AnimationListener mMoveToStartListener = new SimpleAnimationListener() {
+  private final AnimationListener moveToStartListener = new SimpleAnimationListener() {
     @Override public void onAnimationEnd(Animation animation) {
       if (actionSelected) {
         int selectedIndex = actionLayout.getSelectedIndex();
@@ -71,7 +71,7 @@ public class SwipeActionLayout extends ViewGroup {
     }
   };
 
-  private final Animation mAnimateToStartPosition = new Animation() {
+  private final Animation animateToStartPosition = new Animation() {
     @Override
     public void applyTransformation(float interpolatedTime, Transformation t) {
       moveToStart(interpolatedTime);
@@ -416,12 +416,12 @@ public class SwipeActionLayout extends ViewGroup {
 
   private void animateOffsetToStartPosition() {
     from = Math.round(ViewCompat.getTranslationY(actionLayout));
-    mAnimateToStartPosition.reset();
-    mAnimateToStartPosition.setDuration(ANIMATE_TO_START_DURATION);
-    mAnimateToStartPosition.setInterpolator(decelerateInterpolator);
-    mAnimateToStartPosition.setAnimationListener(mMoveToStartListener);
+    animateToStartPosition.reset();
+    animateToStartPosition.setDuration(ANIMATE_TO_START_DURATION);
+    animateToStartPosition.setInterpolator(decelerateInterpolator);
+    animateToStartPosition.setAnimationListener(moveToStartListener);
     actionLayout.clearAnimation();
-    actionLayout.startAnimation(mAnimateToStartPosition);
+    actionLayout.startAnimation(animateToStartPosition);
   }
 
   private void moveToStart(float interpolatedTime) {

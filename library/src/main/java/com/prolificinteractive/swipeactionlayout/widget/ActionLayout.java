@@ -133,10 +133,6 @@ public class ActionLayout extends FrameLayout {
     addView(container);
   }
 
-  public void pop(int... drawables) {
-
-  }
-
   public void populateActionItems(@Nullable final List<? extends ActionItem> items) {
     container.removeAllViews();
     actionItems.clear();
