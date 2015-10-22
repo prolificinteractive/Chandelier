@@ -35,38 +35,38 @@ public class SwipeActionLayout extends ViewGroup {
       android.R.attr.enabled
   };
 
-  private final AttributeSet mAttrs;
-  private final DecelerateInterpolator mDecelerateInterpolator;
+  private final AttributeSet attrs;
+  private final DecelerateInterpolator decelerateInterpolator;
 
-  protected int mFrom;
-  protected int mOriginalOffsetTop;
+  protected int from;
+  protected int originalOffsetTop;
 
-  private boolean mActionSelected;
-  private View mAbsListView;
-  private View mTarget; // the target of the gesture
-  private OnActionListener mListener;
-  private int mTouchSlop;
-  private float mTotalDragDistance = -1;
-  private int mCurrentTargetOffsetTop;
+  private boolean actionSelected;
+  private View absListView;
+  private View target; // the target of the gesture
+  private OnActionListener listener;
+  private int touchSlop;
+  private float totalDragDistance = -1;
+  private int currentTargetOffsetTop;
   // Whether or not the starting offset has been determined.
-  private boolean mOriginalOffsetCalculated = false;
-  private float mInitialMotionY;
-  private float mInitialDownY;
-  private boolean mIsBeingDragged;
-  private int mActivePointerId = INVALID_POINTER;
+  private boolean originalOffsetCalculated = false;
+  private float initialMotionY;
+  private float initialDownY;
+  private boolean isBeingDragged;
+  private int activePointerId = INVALID_POINTER;
   // Target is returning to its start offset because it was cancelled or a
   // refresh was triggered.
-  private boolean mReturningToStart;
-  private ActionLayout mActionLayout;
-  private float mSpinnerFinalOffset;
+  private boolean isReturningToStart;
+  private ActionLayout actionLayout;
+  private float spinnerFinalOffset;
   private IdleScrollListener scrollListener = new IdleScrollListener();
 
   private final AnimationListener mMoveToStartListener = new SimpleAnimationListener() {
     @Override public void onAnimationEnd(Animation animation) {
-      if (mActionSelected) {
-        int selectedIndex = mActionLayout.getSelectedIndex();
-        mListener.onActionSelected(selectedIndex, mActionLayout.getActionItem(selectedIndex));
-        mActionSelected = false;
+      if (actionSelected) {
+        int selectedIndex = actionLayout.getSelectedIndex();
+        listener.onActionSelected(selectedIndex, actionLayout.getActionItem(selectedIndex));
+        actionSelected = false;
       }
     }
   };
@@ -90,16 +90,16 @@ public class SwipeActionLayout extends ViewGroup {
    */
   public SwipeActionLayout(Context context, AttributeSet attrs) {
     super(context, attrs);
-    this.mAttrs = attrs;
+    this.attrs = attrs;
 
     final Resources res = getResources();
     // Defaults
     final int defaultElevation = res.getDimensionPixelSize(R.dimen.default_elevation);
 
-    mTouchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+    touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
 
     setWillNotDraw(false);
-    mDecelerateInterpolator = new DecelerateInterpolator(DECELERATE_INTERPOLATION_FACTOR);
+    decelerateInterpolator = new DecelerateInterpolator(DECELERATE_INTERPOLATION_FACTOR);
 
     final TypedArray a = context.obtainStyledAttributes(attrs, LAYOUT_ATTRS);
     setEnabled(a.getBoolean(0, true));
@@ -116,9 +116,9 @@ public class SwipeActionLayout extends ViewGroup {
   }
 
   private void createProgressView() {
-    mActionLayout = new ActionLayout(getContext(), mAttrs);
-    mActionLayout.setVisibility(View.GONE);
-    addView(mActionLayout);
+    actionLayout = new ActionLayout(getContext(), attrs);
+    actionLayout.setVisibility(View.GONE);
+    addView(actionLayout);
   }
 
   /**
@@ -126,33 +126,33 @@ public class SwipeActionLayout extends ViewGroup {
    * gesture.
    */
   public void setOnActionSelectedListener(OnActionListener listener) {
-    mListener = listener;
+    this.listener = listener;
   }
 
   private void ensureTarget() {
     // Don't bother getting the parent height if the parent hasn't been laid
     // out yet.
-    if (mTarget == null) {
+    if (target == null) {
       for (int i = 0; i < getChildCount(); i++) {
         View child = getChildAt(i);
-        if (!child.equals(mActionLayout)) {
-          mTarget = child;
+        if (!child.equals(actionLayout)) {
+          target = child;
           break;
         }
       }
     }
 
-    if (mAbsListView == null) {
+    if (absListView == null) {
       for (int i = 0; i < getChildCount(); i++) {
         final View child = getChildAt(i);
         if (child instanceof ScrollingView || child instanceof NestedScrollView) {
           // TODO fix validation
-          mAbsListView = child;
-          scrollListener.setParent(mAbsListView);
-          if (mAbsListView instanceof AbsListView) {
-            ((AbsListView) mAbsListView).setOnScrollListener(scrollListener);
-          } else if (mAbsListView instanceof RecyclerView) {
-            ((RecyclerView) mAbsListView).addOnScrollListener(scrollListener);
+          absListView = child;
+          scrollListener.setParent(absListView);
+          if (absListView instanceof AbsListView) {
+            ((AbsListView) absListView).setOnScrollListener(scrollListener);
+          } else if (absListView instanceof RecyclerView) {
+            ((RecyclerView) absListView).addOnScrollListener(scrollListener);
           }
           break;
         }
@@ -167,33 +167,33 @@ public class SwipeActionLayout extends ViewGroup {
     if (getChildCount() == 0) {
       return;
     }
-    if (mTarget == null) {
+    if (target == null) {
       ensureTarget();
     }
-    if (mTarget == null) {
+    if (target == null) {
       return;
     }
-    final View child = mTarget;
+    final View child = target;
     final int childLeft = getPaddingLeft();
     final int childTop = getPaddingTop();
     final int childWidth = width - getPaddingLeft() - getPaddingRight();
     final int childHeight = height - getPaddingTop() - getPaddingBottom();
     child.layout(childLeft, childTop, childLeft + childWidth, childTop + childHeight);
-    mActionLayout.layout(0, mCurrentTargetOffsetTop,
-        width, mCurrentTargetOffsetTop + mActionLayout.getMeasuredHeight());
+    actionLayout.layout(0, currentTargetOffsetTop,
+        width, currentTargetOffsetTop + actionLayout.getMeasuredHeight());
   }
 
   @Override
   public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-    if (mTarget == null) {
+    if (target == null) {
       ensureTarget();
     }
-    if (mTarget == null) {
+    if (target == null) {
       return;
     }
 
-    mTarget.measure(
+    target.measure(
         MeasureSpec.makeMeasureSpec(
             getMeasuredWidth() - getPaddingLeft() - getPaddingRight(),
             MeasureSpec.EXACTLY
@@ -203,16 +203,16 @@ public class SwipeActionLayout extends ViewGroup {
             MeasureSpec.EXACTLY
         ));
 
-    mActionLayout.measure(
+    actionLayout.measure(
         MeasureSpec.makeMeasureSpec(getWidth(), MeasureSpec.EXACTLY),
-        mActionLayout.getMeasuredHeight()
+        actionLayout.getMeasuredHeight()
     );
 
-    if (!mOriginalOffsetCalculated) {
-      mOriginalOffsetCalculated = true;
-      mSpinnerFinalOffset = mActionLayout.getMeasuredHeight();
-      mTotalDragDistance = mSpinnerFinalOffset;
-      mCurrentTargetOffsetTop = mOriginalOffsetTop = -mActionLayout.getMeasuredHeight();
+    if (!originalOffsetCalculated) {
+      originalOffsetCalculated = true;
+      spinnerFinalOffset = actionLayout.getMeasuredHeight();
+      totalDragDistance = spinnerFinalOffset;
+      currentTargetOffsetTop = originalOffsetTop = -actionLayout.getMeasuredHeight();
     }
   }
 
@@ -223,16 +223,16 @@ public class SwipeActionLayout extends ViewGroup {
 
   public boolean canChildScrollUp() {
     if (android.os.Build.VERSION.SDK_INT < 14) {
-      if (mTarget instanceof AbsListView) {
-        final AbsListView absListView = (AbsListView) mTarget;
+      if (target instanceof AbsListView) {
+        final AbsListView absListView = (AbsListView) target;
         return absListView.getChildCount() > 0
             && (absListView.getFirstVisiblePosition() > 0 || absListView.getChildAt(0)
             .getTop() < absListView.getPaddingTop());
       } else {
-        return ViewCompat.canScrollVertically(mTarget, -1) || mTarget.getScrollY() > 0;
+        return ViewCompat.canScrollVertically(target, -1) || target.getScrollY() > 0;
       }
     } else {
-      return ViewCompat.canScrollVertically(mTarget, -1);
+      return ViewCompat.canScrollVertically(target, -1);
     }
   }
 
@@ -242,41 +242,41 @@ public class SwipeActionLayout extends ViewGroup {
 
     final int action = MotionEventCompat.getActionMasked(ev);
 
-    if (mReturningToStart && action == MotionEvent.ACTION_DOWN) {
-      mReturningToStart = false;
+    if (isReturningToStart && action == MotionEvent.ACTION_DOWN) {
+      isReturningToStart = false;
     }
 
-    if (!isEnabled() || mReturningToStart || canChildScrollUp()) {
+    if (!isEnabled() || isReturningToStart || canChildScrollUp()) {
       // Fail fast if we're not in a state where a swipe is possible
       return false;
     }
 
     switch (action) {
       case MotionEvent.ACTION_DOWN:
-        setTargetOffsetTopAndBottom(mOriginalOffsetTop - mActionLayout.getTop());
-        mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
-        mIsBeingDragged = false;
-        final float initialDownY = getMotionEventY(ev, mActivePointerId);
+        setTargetOffsetTopAndBottom(originalOffsetTop - actionLayout.getTop());
+        activePointerId = MotionEventCompat.getPointerId(ev, 0);
+        isBeingDragged = false;
+        final float initialDownY = getMotionEventY(ev, activePointerId);
         if (initialDownY == -1) {
           return false;
         }
-        mInitialDownY = initialDownY;
+        this.initialDownY = initialDownY;
         break;
 
       case MotionEvent.ACTION_MOVE:
-        if (mActivePointerId == INVALID_POINTER) {
+        if (activePointerId == INVALID_POINTER) {
           Log.e(LOG_TAG, "Got ACTION_MOVE event but don't have an active pointer id.");
           return false;
         }
 
-        final float y = getMotionEventY(ev, mActivePointerId);
+        final float y = getMotionEventY(ev, activePointerId);
         if (y == -1) {
           return false;
         }
-        final float yDiff = y - mInitialDownY;
-        if (yDiff > mTouchSlop && !mIsBeingDragged) {
-          mInitialMotionY = mInitialDownY + mTouchSlop;
-          mIsBeingDragged = true;
+        final float yDiff = y - this.initialDownY;
+        if (yDiff > touchSlop && !isBeingDragged) {
+          initialMotionY = this.initialDownY + touchSlop;
+          isBeingDragged = true;
         }
         break;
 
@@ -286,12 +286,12 @@ public class SwipeActionLayout extends ViewGroup {
 
       case MotionEvent.ACTION_UP:
       case MotionEvent.ACTION_CANCEL:
-        mIsBeingDragged = false;
-        mActivePointerId = INVALID_POINTER;
+        isBeingDragged = false;
+        activePointerId = INVALID_POINTER;
         break;
     }
 
-    return mIsBeingDragged;
+    return isBeingDragged;
   }
 
   private float getMotionEventY(MotionEvent ev, int activePointerId) {
@@ -307,8 +307,8 @@ public class SwipeActionLayout extends ViewGroup {
     // if this is a List < L or another view that doesn't support nested
     // scrolling, ignore this request so that the vertical scroll event
     // isn't stolen
-    if ((android.os.Build.VERSION.SDK_INT >= 21 || !(mTarget instanceof AbsListView))
-        && (mTarget == null || ViewCompat.isNestedScrollingEnabled(mTarget))) {
+    if ((android.os.Build.VERSION.SDK_INT >= 21 || !(target instanceof AbsListView))
+        && (target == null || ViewCompat.isNestedScrollingEnabled(target))) {
       super.requestDisallowInterceptTouchEvent(b);
     }
   }
@@ -318,21 +318,21 @@ public class SwipeActionLayout extends ViewGroup {
   }
 
   private void moveActionLayout(final float overscrollTop) {
-    final float originalDragPercent = overscrollTop / mTotalDragDistance;
+    final float originalDragPercent = overscrollTop / totalDragDistance;
     final float dragPercent = Math.min(1f, Math.abs(originalDragPercent));
-    final int targetY = mOriginalOffsetTop + (int) (mSpinnerFinalOffset * dragPercent);
+    final int targetY = originalOffsetTop + (int) (spinnerFinalOffset * dragPercent);
 
-    if (mActionLayout.getVisibility() != View.VISIBLE) {
-      mActionLayout.setVisibility(View.VISIBLE);
+    if (actionLayout.getVisibility() != View.VISIBLE) {
+      actionLayout.setVisibility(View.VISIBLE);
     }
-    setTargetOffsetTopAndBottom(targetY - mCurrentTargetOffsetTop);
-    mActionLayout.onLayoutTranslated(1 - (float) targetY / mCurrentTargetOffsetTop);
+    setTargetOffsetTopAndBottom(targetY - currentTargetOffsetTop);
+    actionLayout.onLayoutTranslated(1 - (float) targetY / currentTargetOffsetTop);
   }
 
   private void finishAction(final float overscrollTop) {
-    mActionSelected = overscrollTop > mTotalDragDistance;
-    if (mActionSelected) {
-      mActionLayout.finishAction(new SimpleAnimationListener() {
+    actionSelected = overscrollTop > totalDragDistance;
+    if (actionSelected) {
+      actionLayout.finishAction(new SimpleAnimationListener() {
         @Override public void onAnimationEnd(Animation animation) {
           animateOffsetToStartPosition();
         }
@@ -346,31 +346,31 @@ public class SwipeActionLayout extends ViewGroup {
   public boolean onTouchEvent(MotionEvent ev) {
     final int action = MotionEventCompat.getActionMasked(ev);
 
-    if (mReturningToStart && action == MotionEvent.ACTION_DOWN) {
-      mReturningToStart = false;
+    if (isReturningToStart && action == MotionEvent.ACTION_DOWN) {
+      isReturningToStart = false;
     }
 
-    if (!isEnabled() || mReturningToStart || canChildScrollUp() || !scrollListener.isIdle()) {
+    if (!isEnabled() || isReturningToStart || canChildScrollUp() || !scrollListener.isIdle()) {
       // Fail fast if we're not in a state where a swipe is possible
       return false;
     }
 
     switch (action) {
       case MotionEvent.ACTION_DOWN:
-        mActivePointerId = MotionEventCompat.getPointerId(ev, 0);
-        mIsBeingDragged = false;
+        activePointerId = MotionEventCompat.getPointerId(ev, 0);
+        isBeingDragged = false;
         break;
 
       case MotionEvent.ACTION_MOVE: {
-        final int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
+        final int pointerIndex = MotionEventCompat.findPointerIndex(ev, activePointerId);
         if (pointerIndex < 0) {
           Log.e(LOG_TAG, "Got ACTION_MOVE event but have an invalid active pointer id.");
           return false;
         }
 
         final float y = MotionEventCompat.getY(ev, pointerIndex);
-        final float overscrollTop = (y - mInitialMotionY) * DRAG_RATE;
-        if (mIsBeingDragged) {
+        final float overscrollTop = (y - initialMotionY) * DRAG_RATE;
+        if (isBeingDragged) {
           if (overscrollTop > 0) {
             moveActionLayout(overscrollTop);
           } else {
@@ -381,7 +381,7 @@ public class SwipeActionLayout extends ViewGroup {
       }
       case MotionEventCompat.ACTION_POINTER_DOWN: {
         final int index = MotionEventCompat.getActionIndex(ev);
-        mActivePointerId = MotionEventCompat.getPointerId(ev, index);
+        activePointerId = MotionEventCompat.getPointerId(ev, index);
         break;
       }
 
@@ -391,62 +391,62 @@ public class SwipeActionLayout extends ViewGroup {
 
       case MotionEvent.ACTION_UP:
       case MotionEvent.ACTION_CANCEL: {
-        if (mActivePointerId == INVALID_POINTER) {
+        if (activePointerId == INVALID_POINTER) {
           if (action == MotionEvent.ACTION_UP) {
             Log.e(LOG_TAG, "Got ACTION_UP event but don't have an active pointer id.");
           }
           return false;
         }
-        final int pointerIndex = MotionEventCompat.findPointerIndex(ev, mActivePointerId);
+        final int pointerIndex = MotionEventCompat.findPointerIndex(ev, activePointerId);
         final float y = MotionEventCompat.getY(ev, pointerIndex);
-        final float overscrollTop = (y - mInitialMotionY) * DRAG_RATE;
-        mIsBeingDragged = false;
+        final float overscrollTop = (y - initialMotionY) * DRAG_RATE;
+        isBeingDragged = false;
         finishAction(overscrollTop);
-        mActivePointerId = INVALID_POINTER;
+        activePointerId = INVALID_POINTER;
         return false;
       }
     }
 
-    if (mActionLayout != null) {
-      mActionLayout.onParentTouchEvent(ev);
+    if (actionLayout != null) {
+      actionLayout.onParentTouchEvent(ev);
     }
 
     return true;
   }
 
   private void animateOffsetToStartPosition() {
-    mFrom = Math.round(ViewCompat.getTranslationY(mActionLayout));
+    from = Math.round(ViewCompat.getTranslationY(actionLayout));
     mAnimateToStartPosition.reset();
     mAnimateToStartPosition.setDuration(ANIMATE_TO_START_DURATION);
-    mAnimateToStartPosition.setInterpolator(mDecelerateInterpolator);
+    mAnimateToStartPosition.setInterpolator(decelerateInterpolator);
     mAnimateToStartPosition.setAnimationListener(mMoveToStartListener);
-    mActionLayout.clearAnimation();
-    mActionLayout.startAnimation(mAnimateToStartPosition);
+    actionLayout.clearAnimation();
+    actionLayout.startAnimation(mAnimateToStartPosition);
   }
 
   private void moveToStart(float interpolatedTime) {
-    setTargetOffsetTopAndBottom(Math.round((1 - interpolatedTime) * mFrom));
+    setTargetOffsetTopAndBottom(Math.round((1 - interpolatedTime) * from));
   }
 
   private void setTargetOffsetTopAndBottom(final int offset) {
-    ViewCompat.setTranslationY(mActionLayout, offset);
-    ViewCompat.setTranslationY(mAbsListView, offset);
-    mCurrentTargetOffsetTop = mActionLayout.getTop();
+    ViewCompat.setTranslationY(actionLayout, offset);
+    ViewCompat.setTranslationY(absListView, offset);
+    currentTargetOffsetTop = actionLayout.getTop();
   }
 
   private void onSecondaryPointerUp(MotionEvent ev) {
     final int pointerIndex = MotionEventCompat.getActionIndex(ev);
     final int pointerId = MotionEventCompat.getPointerId(ev, pointerIndex);
-    if (pointerId == mActivePointerId) {
+    if (pointerId == activePointerId) {
       // This was our active pointer going up. Choose a new
       // active pointer and adjust accordingly.
       final int newPointerIndex = pointerIndex == 0 ? 1 : 0;
-      mActivePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
+      activePointerId = MotionEventCompat.getPointerId(ev, newPointerIndex);
     }
   }
 
   public void populateActionItems(@Nullable final List<? extends ActionItem> items) {
-    mActionLayout.populateActionItems(items);
+    actionLayout.populateActionItems(items);
   }
 
   /**

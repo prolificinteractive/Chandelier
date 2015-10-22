@@ -18,7 +18,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import com.prolificinteractive.swipeactionlayout.R;
-import com.prolificinteractive.swipeactionlayout.widget.listener.SimpleAnimationListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,15 +26,11 @@ import static android.view.Gravity.CENTER_VERTICAL;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-/**
- * Created by chahine on 10/14/15.
- */
 public class ActionLayout extends FrameLayout {
 
   private static final int ITEM_WEIGHT = 1;
   private static final AccelerateInterpolator ACCELERATE_INTERPOLATOR =
       new AccelerateInterpolator();
-  public static final String TAG = ActionLayout.class.getSimpleName();
   private static final AccelerateDecelerateInterpolator ACCELERATE_DECELERATE_INTERPOLATOR =
       new AccelerateDecelerateInterpolator();
   private static final int DEFAULT_SCALE = 1;
