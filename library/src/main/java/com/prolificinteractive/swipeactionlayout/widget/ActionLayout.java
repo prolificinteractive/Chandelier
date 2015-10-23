@@ -27,9 +27,6 @@ import static android.view.Gravity.CENTER_VERTICAL;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-/**
- * Created by chahine on 10/14/15.
- */
 public class ActionLayout extends FrameLayout {
 
   public static final String TAG = ActionLayout.class.getSimpleName();
