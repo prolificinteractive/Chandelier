@@ -10,6 +10,7 @@ import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
+import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
@@ -18,7 +19,6 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import com.prolificinteractive.swipeactionlayout.R;
-import com.prolificinteractive.swipeactionlayout.widget.listener.SimpleAnimationListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,10 +32,11 @@ import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
  */
 public class ActionLayout extends FrameLayout {
 
+  public static final String TAG = ActionLayout.class.getSimpleName();
+
   private static final int ITEM_WEIGHT = 1;
   private static final AccelerateInterpolator ACCELERATE_INTERPOLATOR =
       new AccelerateInterpolator();
-  public static final String TAG = ActionLayout.class.getSimpleName();
   private static final AccelerateDecelerateInterpolator ACCELERATE_DECELERATE_INTERPOLATOR =
       new AccelerateDecelerateInterpolator();
   private static final int DEFAULT_SCALE = 1;
@@ -49,11 +50,14 @@ public class ActionLayout extends FrameLayout {
   private final List<ImageView> imageViews = new ArrayList<>();
   private final int actionItemLayoutHeight;
   private final int actionItemLayoutWidth;
+  private final int shortAnimDuration =
+      getResources().getInteger(android.R.integer.config_shortAnimTime);
 
   private boolean isScaleEnabled;
   private int measuredWidth;
   private int selectedIndex = -1;
   private boolean isAnimating = false;
+  private Animation.AnimationListener actionListener;
 
   private final Animation.AnimationListener animationListener = new SimpleAnimationListener() {
     @Override public void onAnimationStart(Animation animation) {
@@ -68,10 +72,6 @@ public class ActionLayout extends FrameLayout {
       actionListener = null;
     }
   };
-
-  private Animation.AnimationListener actionListener;
-  private final int shortAnimDuration =
-      getResources().getInteger(android.R.integer.config_shortAnimTime);
 
   public ActionLayout(final Context context, final AttributeSet attrs) {
     super(context);
@@ -134,12 +134,18 @@ public class ActionLayout extends FrameLayout {
       setBackgroundColor(typedValue.data);
     }
 
+    a.recycle();
+
     addView(selectedImageView);
     addView(container);
   }
 
-  public void pop(int... drawables) {
-
+  public void populateActionItems(int... drawablesResIds) {
+    final ArrayList<ActionItem> items = new ArrayList<>();
+    for (int resId : drawablesResIds) {
+      items.add(new ActionItem(resId));
+    }
+    populateActionItems(items);
   }
 
   public void populateActionItems(@Nullable final List<? extends ActionItem> items) {
@@ -268,14 +274,14 @@ public class ActionLayout extends FrameLayout {
   }
 
   private void setSelectedIndex(final int newSelectedIndex) {
-    // Unselect old index
+    // Un-select previous index
     imageViews.get(selectedIndex).setSelected(false);
 
     selectedIndex = newSelectedIndex;
-    final int iW = measuredWidth / actionItems.size();
-    final int target = iW * selectedIndex + (iW - selectedSize) / 2;
     isAnimating = true;
 
+    final int iW = measuredWidth / actionItems.size();
+    final int target = iW * selectedIndex + (iW - selectedSize) / 2;
     final float currentScale = selectedImageView.getScaleX();
     final float currentTranslation = selectedImageView.getTranslationX();
 
@@ -302,7 +308,7 @@ public class ActionLayout extends FrameLayout {
     return Math.max(min, Math.min(max, value));
   }
 
-  int getSelectedIndex() {
+  public int getSelectedIndex() {
     return selectedIndex;
   }
 

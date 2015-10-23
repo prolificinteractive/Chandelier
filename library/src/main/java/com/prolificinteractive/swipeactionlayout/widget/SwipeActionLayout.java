@@ -77,6 +77,8 @@ public class SwipeActionLayout extends ViewGroup {
       moveToStart(interpolatedTime);
     }
   };
+  private boolean isShowingAction = false;
+  private MotionEvent previousEv;
 
   /**
    * Simple constructor to use when creating a SwipeRefreshLayout from code.
@@ -154,6 +156,15 @@ public class SwipeActionLayout extends ViewGroup {
           } else if (mAbsListView instanceof RecyclerView) {
             ((RecyclerView) mAbsListView).addOnScrollListener(scrollListener);
           }
+          mAbsListView.setOnTouchListener(new OnTouchListener() {
+            @Override public boolean onTouch(View v, MotionEvent event) {
+              if (isShowingAction) {
+                onTouchEvent(event);
+                return true;
+              }
+              return false;
+            }
+          });
           break;
         }
       }
@@ -318,6 +329,8 @@ public class SwipeActionLayout extends ViewGroup {
   }
 
   private void moveActionLayout(final float overscrollTop) {
+    Log.d(LOG_TAG,
+        "### overscrollTop: " + overscrollTop + "; mOriginalOffsetTop: " + mOriginalOffsetTop);
     final float originalDragPercent = overscrollTop / mTotalDragDistance;
     final float dragPercent = Math.min(1f, Math.abs(originalDragPercent));
     final int targetY = mOriginalOffsetTop + (int) (mSpinnerFinalOffset * dragPercent);
@@ -345,13 +358,24 @@ public class SwipeActionLayout extends ViewGroup {
   @Override
   public boolean onTouchEvent(MotionEvent ev) {
     final int action = MotionEventCompat.getActionMasked(ev);
+    //Log.d(LOG_TAG, "### " + ev);
+    previousEv = ev;
 
     if (mReturningToStart && action == MotionEvent.ACTION_DOWN) {
       mReturningToStart = false;
     }
 
-    if (!isEnabled() || mReturningToStart || canChildScrollUp() || !scrollListener.isIdle()) {
+    if (action == MotionEvent.ACTION_UP && isShowingAction) {
+      hideActions();
+      return true;
+    }
+
+    if (!isEnabled() || mReturningToStart || canChildScrollUp() || (!scrollListener.isIdle()
+        && !isShowingAction)) {
       // Fail fast if we're not in a state where a swipe is possible
+      if (mActionLayout != null && isShowingAction) {
+        mActionLayout.onParentTouchEvent(ev);
+      }
       return false;
     }
 
@@ -373,7 +397,8 @@ public class SwipeActionLayout extends ViewGroup {
         if (mIsBeingDragged) {
           if (overscrollTop > 0) {
             moveActionLayout(overscrollTop);
-          } else {
+          } else if (!isShowingAction) {
+            Log.d(LOG_TAG, "### false");
             return false;
           }
         }
@@ -447,6 +472,32 @@ public class SwipeActionLayout extends ViewGroup {
 
   public void populateActionItems(@Nullable final List<? extends ActionItem> items) {
     mActionLayout.populateActionItems(items);
+  }
+
+  public void showActions() {
+    isShowingAction = true;
+    final Animation showAnimation = new Animation() {
+      @Override protected void applyTransformation(float interpolatedTime, Transformation t) {
+        moveActionLayout(-interpolatedTime * mOriginalOffsetTop);
+      }
+    };
+    showAnimation.reset();
+    showAnimation.setDuration(200);
+    startAnimation(showAnimation);
+  }
+
+  private void hideActions() {
+    //mInitialMotionY = getMotionEventY(previousEv, mActivePointerId) + mTouchSlop;
+    isShowingAction = false;
+    final float top = ViewCompat.getTranslationY(mActionLayout);
+    final Animation hideAnimation = new Animation() {
+      @Override protected void applyTransformation(float interpolatedTime, Transformation t) {
+        moveActionLayout((1 - interpolatedTime) * top);
+      }
+    };
+    hideAnimation.reset();
+    hideAnimation.setDuration(200);
+    startAnimation(hideAnimation);
   }
 
   /**

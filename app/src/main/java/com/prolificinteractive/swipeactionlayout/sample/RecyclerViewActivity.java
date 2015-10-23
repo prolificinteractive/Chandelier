@@ -34,7 +34,8 @@ public class RecyclerViewActivity extends AppCompatActivity {
     swipeActionLayout = (SwipeActionLayout) findViewById(R.id.swipe_action_layout);
     swipeActionLayout.setOnActionSelectedListener(new SwipeActionLayout.OnActionListener() {
       @Override public void onActionSelected(int index, ActionItem action) {
-        Toast.makeText(RecyclerViewActivity.this, index + "", Toast.LENGTH_SHORT).show();
+        Toast.makeText(RecyclerViewActivity.this, String.format("%d", index), Toast.LENGTH_SHORT)
+            .show();
       }
     });
 
@@ -72,12 +73,16 @@ public class RecyclerViewActivity extends AppCompatActivity {
     return super.onOptionsItemSelected(item);
   }
 
-  class DummyAdapter extends RecyclerView.Adapter<DummyViewHolder> {
+  class DummyAdapter extends RecyclerView.Adapter<DummyViewHolder>
+      implements View.OnLongClickListener {
 
     @Override
     public DummyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-      return new DummyViewHolder(
-          LayoutInflater.from(parent.getContext()).inflate(R.layout.item_dummy, list, false));
+      final View view = LayoutInflater
+          .from(parent.getContext())
+          .inflate(R.layout.item_dummy, list, false);
+      view.setOnLongClickListener(this);
+      return new DummyViewHolder(view);
     }
 
     @Override
@@ -90,12 +95,17 @@ public class RecyclerViewActivity extends AppCompatActivity {
     public int getItemCount() {
       return 10;
     }
+
+    @Override public boolean onLongClick(View v) {
+      swipeActionLayout.showActions();
+      return true;
+    }
   }
 
   class DummyViewHolder extends RecyclerView.ViewHolder {
 
-    final TextView title;
-    final TextView subtitle;
+    private final TextView title;
+    private final TextView subtitle;
 
     public DummyViewHolder(View view) {
       super(view);
