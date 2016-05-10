@@ -57,6 +57,7 @@ public class SwipeActionLayout extends ViewGroup {
   // Target is returning to its start offset because it was cancelled or a
   // refresh was triggered.
   private boolean isReturningToStart;
+  private int animateToStartDuration;
   private ActionLayout actionLayout;
   private float spinnerFinalOffset;
   private IdleScrollListener scrollListener = new IdleScrollListener();
@@ -78,7 +79,6 @@ public class SwipeActionLayout extends ViewGroup {
     }
   };
   private boolean isShowingAction = false;
-  private MotionEvent previousEv;
 
   /**
    * Simple constructor to use when creating a SwipeRefreshLayout from code.
@@ -110,6 +110,10 @@ public class SwipeActionLayout extends ViewGroup {
       setElevation(
           a.getDimensionPixelSize(R.styleable.SwipeActionLayout_al_elevation, defaultElevation));
     }
+
+    animateToStartDuration =
+        a.getInteger(R.styleable.SwipeActionLayout_al_animate_to_start_duration,
+            ANIMATE_TO_START_DURATION);
 
     a.recycle();
 
@@ -231,7 +235,6 @@ public class SwipeActionLayout extends ViewGroup {
    * @return Whether it is possible for the child view of this layout to
    * scroll up. Override this if the child view is a custom view.
    */
-
   public boolean canChildScrollUp() {
     if (android.os.Build.VERSION.SDK_INT < 14) {
       if (target instanceof AbsListView) {
@@ -324,10 +327,6 @@ public class SwipeActionLayout extends ViewGroup {
     }
   }
 
-  private boolean isAnimationRunning(Animation animation) {
-    return animation != null && animation.hasStarted() && !animation.hasEnded();
-  }
-
   private void moveActionLayout(final float overscrollTop) {
     Log.d(LOG_TAG,
         "### overscrollTop: " + overscrollTop + "; mOriginalOffsetTop: " + originalOffsetTop);
@@ -358,8 +357,6 @@ public class SwipeActionLayout extends ViewGroup {
   @Override
   public boolean onTouchEvent(MotionEvent ev) {
     final int action = MotionEventCompat.getActionMasked(ev);
-    //Log.d(LOG_TAG, "### " + ev);
-    previousEv = ev;
 
     if (isReturningToStart && action == MotionEvent.ACTION_DOWN) {
       isReturningToStart = false;
@@ -442,7 +439,7 @@ public class SwipeActionLayout extends ViewGroup {
   private void animateOffsetToStartPosition() {
     from = Math.round(ViewCompat.getTranslationY(actionLayout));
     animateToStartPosition.reset();
-    animateToStartPosition.setDuration(ANIMATE_TO_START_DURATION);
+    animateToStartPosition.setDuration(animateToStartDuration);
     animateToStartPosition.setInterpolator(decelerateInterpolator);
     animateToStartPosition.setAnimationListener(moveToStartListener);
     actionLayout.clearAnimation();
@@ -470,10 +467,18 @@ public class SwipeActionLayout extends ViewGroup {
     }
   }
 
+  /**
+   * Add a list of actions to the {@link SwipeActionLayout}.
+   *
+   * @param items list of {@link ActionItem} to display
+   */
   public void populateActionItems(@Nullable final List<? extends ActionItem> items) {
     actionLayout.populateActionItems(items);
   }
 
+  /**
+   * Show the actions of the {@link SwipeActionLayout}
+   */
   public void showActions() {
     isShowingAction = true;
     final Animation showAnimation = new Animation() {
@@ -486,7 +491,10 @@ public class SwipeActionLayout extends ViewGroup {
     startAnimation(showAnimation);
   }
 
-  private void hideActions() {
+  /**
+   * Hide the actions of the {@link SwipeActionLayout}
+   */
+  public void hideActions() {
     isShowingAction = false;
     final float top = ViewCompat.getTranslationY(actionLayout);
     final Animation hideAnimation = new Animation() {
@@ -497,6 +505,16 @@ public class SwipeActionLayout extends ViewGroup {
     hideAnimation.reset();
     hideAnimation.setDuration(200);
     startAnimation(hideAnimation);
+  }
+
+  /**
+   * Set the duration that the layout takes to get into its original position. Default is
+   * {@link SwipeActionLayout#ANIMATE_TO_START_DURATION} = 300 millisecond.
+   *
+   * @param duration in millisecond
+   */
+  public void setAnimateToStartDuration(final int duration) {
+    animateToStartDuration = duration;
   }
 
   /**
