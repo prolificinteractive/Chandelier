@@ -10,7 +10,6 @@ import android.support.v4.view.ViewCompat;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
-import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
@@ -28,8 +27,6 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
 public class ActionLayout extends FrameLayout {
-
-  public static final String TAG = ActionLayout.class.getSimpleName();
 
   private static final int ITEM_WEIGHT = 1;
   private static final AccelerateInterpolator ACCELERATE_INTERPOLATOR =
@@ -156,9 +153,9 @@ public class ActionLayout extends FrameLayout {
       for (final ActionItem item : items) {
         final FrameLayout frame = new FrameLayout(context);
         frame.setLayoutParams(new LinearLayout.LayoutParams(
-                MATCH_PARENT,
-                WRAP_CONTENT,
-                ITEM_WEIGHT)
+            MATCH_PARENT,
+            WRAP_CONTENT,
+            ITEM_WEIGHT)
         );
 
         final ImageView imageView = new ImageView(context);

@@ -4,9 +4,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.AbsListView;
 
-class IdleScrollListener extends RecyclerView.OnScrollListener implements AbsListView.OnScrollListener {
-  Class parentType;
-  int scrollState;
+class IdleScrollListener extends RecyclerView.OnScrollListener
+    implements AbsListView.OnScrollListener {
+  private Class parentType;
+  private int scrollState;
 
   public void setParent(View view) {
     parentType = view.getClass();
