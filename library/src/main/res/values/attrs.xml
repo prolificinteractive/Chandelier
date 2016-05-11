@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <declare-styleable name="SwipeActionLayout">
+    <!-- Action Layout -->
+    <attr name="al_background" format="reference" />
+    <attr name="al_elevation" format="dimension" />
+    <attr name="al_selector" format="reference" />
+    <attr name="al_selected_size" format="dimension" />
+    <attr name="al_scale_enabled" format="boolean" />
+    <attr name="al_animate_to_start_duration" format="integer" />
+
+    <!-- Action Item -->
+    <attr name="ai_margin" format="dimension" />
+    <attr name="ai_layout_height" format="dimension" />
+    <attr name="ai_layout_width" format="dimension" />
+  </declare-styleable>
+</resources>

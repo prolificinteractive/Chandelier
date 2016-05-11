@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    >
+
+  <include layout="@layout/include_toolbar" />
+
+  <com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout
+      android:id="@+id/swipe_action_layout"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_below="@id/toolbar"
+      app:al_background="?attr/colorPrimary"
+      >
+    <include layout="@layout/content_recycler_view" />
+  </com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout>
+</RelativeLayout>
