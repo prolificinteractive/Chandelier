@@ -18,8 +18,8 @@ Or
 
 1. Add `compile 'com.prolificinteractive:swipe-action-layout:1.0.0'` to your dependencies.
 2. Wrap your list around `SwipeActionLayout` in your layouts or view hierarchy.
-3. Create Objects that extend `ActionItem`
-4. Override `ActionItem#Execute()` method to do the action when selected.
+3. Create Objects that extend `ActionItem` and add them using `MaterialCalendarView#populateActionItems()` method.
+4. Override `ActionItem#Execute()` method to execute the action when selected.
 
 Example:
 
@@ -36,6 +36,20 @@ Example:
   
   </com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout>
 ```
+
+Customization
+-------------
+
+XML attributes:
+
+- `al_background` Set background color
+- `al_elevation` Set elevation 
+- `al_selector` Set background selector
+- `al_animate_to_start_duration` Set the duration that the layout takes to get into its original position. Default is 300 Millisecond.
+
+- `ai_margin` Set action item margin
+
+Mare sure to check sample for more examples.
 
 Contributing
 ============
