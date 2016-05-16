@@ -7,5 +7,5 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:showIn="@layout/activity_web_view"
-    tools:context="com.prolificinteractive.swipeactionlayout.sample.WebViewActivity">
+    tools:context="com.prolificinteractive.chandelier.sample.WebViewActivity">
 </WebView>

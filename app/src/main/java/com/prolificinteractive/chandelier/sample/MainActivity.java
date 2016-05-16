@@ -1,4 +1,4 @@
-package com.prolificinteractive.swipeactionlayout.sample;
+package com.prolificinteractive.chandelier.sample;
 
 import android.content.ComponentName;
 import android.content.Context;
@@ -18,7 +18,7 @@ import android.widget.TextView;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-  private static final String CATEGORY_SAMPLE = "com.prolificinteractive.swipeactionlayout.sample.SAMPLE";
+  private static final String CATEGORY_SAMPLE = "com.prolificinteractive.chandelier.sample.SAMPLE";
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {

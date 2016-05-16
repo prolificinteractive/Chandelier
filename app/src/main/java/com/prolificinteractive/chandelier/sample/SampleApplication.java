@@ -1,4 +1,4 @@
-package com.prolificinteractive.swipeactionlayout.sample;
+package com.prolificinteractive.chandelier.sample;
 
 import android.app.Application;
 import com.squareup.leakcanary.LeakCanary;

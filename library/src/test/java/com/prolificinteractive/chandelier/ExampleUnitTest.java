@@ -1,4 +1,4 @@
-package com.prolificinteractive.swipeactionlayout;
+package com.prolificinteractive.chandelier;
 
 import org.junit.Test;
 

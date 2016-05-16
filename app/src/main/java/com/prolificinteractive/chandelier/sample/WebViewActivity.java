@@ -1,4 +1,4 @@
-package com.prolificinteractive.swipeactionlayout.sample;
+package com.prolificinteractive.chandelier.sample;
 
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
@@ -12,8 +12,8 @@ import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
-import com.prolificinteractive.swipeactionlayout.widget.ActionItem;
-import com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout;
+import com.prolificinteractive.chandelier.widget.Ornament;
+import com.prolificinteractive.chandelier.widget.ChandelierLayout;
 import java.util.Arrays;
 
 public class WebViewActivity extends AppCompatActivity {
@@ -23,7 +23,7 @@ public class WebViewActivity extends AppCompatActivity {
   public static final String GITHUB_PULLS_URL = GITHUB_URL + "pulls";
   public static final String GITHUB_SEARCH_URL = GITHUB_URL + "search";
 
-  private SwipeActionLayout swipeActionLayout;
+  private ChandelierLayout chandelierLayout;
   private WebView webView;
 
   @Override
@@ -51,13 +51,13 @@ public class WebViewActivity extends AppCompatActivity {
     });
     webView.loadUrl(GITHUB_URL);
 
-    swipeActionLayout = (SwipeActionLayout) findViewById(R.id.swipe_action_layout);
-    swipeActionLayout.setOnActionSelectedListener(new SwipeActionLayout.OnActionListener() {
-      @Override public void onActionSelected(int index, ActionItem action) {
+    chandelierLayout = (ChandelierLayout) findViewById(R.id.chandelier_layout);
+    chandelierLayout.setOnActionSelectedListener(new ChandelierLayout.OnActionListener() {
+      @Override public void onActionSelected(int index, Ornament action) {
         action.execute();
       }
     });
-    swipeActionLayout.populateActionItems(Arrays.asList(
+    chandelierLayout.populateActionItems(Arrays.asList(
         new GitHubAction.Builder()
             .setDrawableResId(R.drawable.ic_notifications)
             .setUrl(GITHUB_NOTIFICATIONS_URL)
@@ -84,7 +84,7 @@ public class WebViewActivity extends AppCompatActivity {
     });
   }
 
-  static class GitHubAction extends ActionItem {
+  static class GitHubAction extends Ornament {
     private String url;
     private WebView webView;
 

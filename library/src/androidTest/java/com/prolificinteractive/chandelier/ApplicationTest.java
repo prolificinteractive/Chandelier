@@ -1,4 +1,4 @@
-package com.prolificinteractive.swipeactionlayout;
+package com.prolificinteractive.chandelier;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
