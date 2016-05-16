@@ -1,4 +1,4 @@
-Swipe Action Layout [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-swipe--action--layout-green.svg?style=true)](https://android-arsenal.com/details/1/3598)
+Swipe Action Layout [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-swipe--action--layout-blue.svg?style=true)](https://android-arsenal.com/details/1/3598)
 ===================
 
 A nice swipe layout that provides new actions with a material design look and feel.
