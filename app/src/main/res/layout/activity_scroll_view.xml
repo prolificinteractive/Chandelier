@@ -17,7 +17,11 @@
       android:layout_below="@+id/toolbar"
       app:chandelier_background="?attr/colorPrimary"
       >
-    <FrameLayout
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+      <FrameLayout
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           >
@@ -36,5 +40,6 @@
             style="?android:attr/progressBarStyle"
             />
       </FrameLayout>
+    </ScrollView>
   </com.prolificinteractive.chandelier.widget.ChandelierLayout>
 </RelativeLayout>

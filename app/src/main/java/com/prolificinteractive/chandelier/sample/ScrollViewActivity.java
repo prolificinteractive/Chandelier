@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.prolificinteractive.chandelier.widget.ChandelierLayout;
 import com.prolificinteractive.chandelier.widget.Ornament;
@@ -22,6 +24,7 @@ public class ScrollViewActivity extends AppCompatActivity {
 
     final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     final TextView textView = (TextView) findViewById(R.id.text_view);
+    final ProgressBar progressBar = (ProgressBar) findViewById(R.id.progress);
     setSupportActionBar(toolbar);
 
     chandelierLayout = (ChandelierLayout) findViewById(R.id.chandelier_layout);
@@ -31,13 +34,16 @@ public class ScrollViewActivity extends AppCompatActivity {
         switch (index) {
           case 0:
             text = "Close";
+            progressBar.setVisibility(View.GONE);
             break;
           case 1:
             text = "Add";
+            progressBar.setVisibility(View.VISIBLE);
             break;
           case 2:
           default:
             text = "Check";
+            progressBar.setVisibility(View.GONE);
             break;
         }
         textView.setText(text);
