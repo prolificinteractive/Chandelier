@@ -21,16 +21,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
-      <FrameLayout
+      <LinearLayout
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:layout_gravity="center"
           >
-        <TextView
-            android:id="@+id/text_view"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="16dp"
-            />
 
         <ProgressBar
             android:id="@+id/progress"
@@ -39,7 +35,15 @@
             android:layout_gravity="center"
             style="?android:attr/progressBarStyle"
             />
-      </FrameLayout>
+        <TextView
+            android:id="@+id/text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:padding="16dp"
+            style="@style/Base.TextAppearance.AppCompat.Title"
+            />
+      </LinearLayout>
     </ScrollView>
   </com.prolificinteractive.chandelier.widget.ChandelierLayout>
 </RelativeLayout>
