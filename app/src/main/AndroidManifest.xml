@@ -45,6 +45,16 @@
         <category android:name="com.prolificinteractive.chandelier.sample.SAMPLE"/>
       </intent-filter>
     </activity>
+    <activity
+        android:name=".ScrollViewActivity"
+        android:label="@string/title_activity_linear_layout"
+        android:theme="@style/AppTheme.NoActionBar"
+        >
+      <intent-filter>
+        <action android:name="android.intent.action.RUN"/>
+        <category android:name="com.prolificinteractive.chandelier.sample.SAMPLE"/>
+      </intent-filter>
+    </activity>
   </application>
 
 </manifest>

@@ -26,7 +26,7 @@ import static android.view.Gravity.CENTER_VERTICAL;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-public class OrnamentLayout extends FrameLayout {
+class OrnamentLayout extends FrameLayout {
 
   private static final int ITEM_WEIGHT = 1;
   private static final AccelerateInterpolator ACCELERATE_INTERPOLATOR =
@@ -86,8 +86,8 @@ public class OrnamentLayout extends FrameLayout {
     actionItemLayoutHeight =
         a.getDimensionPixelSize(R.styleable.ChandelierLayout_ornament_layout_height,
             WRAP_CONTENT);
-    actionItemLayoutWidth = a.getDimensionPixelSize(R.styleable.ChandelierLayout_ornament_layout_width,
-        WRAP_CONTENT);
+    actionItemLayoutWidth =
+        a.getDimensionPixelSize(R.styleable.ChandelierLayout_ornament_layout_width, WRAP_CONTENT);
 
     // Action Layout
     container = new LinearLayout(context);
@@ -96,7 +96,8 @@ public class OrnamentLayout extends FrameLayout {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       setElevation(
-          a.getDimensionPixelSize(R.styleable.ChandelierLayout_chandelier_elevation, defaultElevation));
+          a.getDimensionPixelSize(R.styleable.ChandelierLayout_chandelier_elevation,
+              defaultElevation));
     }
 
     container.setOrientation(LinearLayout.HORIZONTAL);
@@ -104,7 +105,8 @@ public class OrnamentLayout extends FrameLayout {
 
     // Action Item
     imageViewMargin =
-        a.getDimensionPixelSize(R.styleable.ChandelierLayout_ornament_margin, defaultSelectorMargin);
+        a.getDimensionPixelSize(R.styleable.ChandelierLayout_ornament_margin,
+            defaultSelectorMargin);
     selectedSize = a.getDimensionPixelSize(R.styleable.ChandelierLayout_chandelier_selected_size,
         defaultSelectorSize);
     selectedImageView = new ImageView(context);

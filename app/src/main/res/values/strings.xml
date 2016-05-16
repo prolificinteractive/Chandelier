@@ -4,4 +4,5 @@
 
   <string name="title_activity_web_view">WebViewActivity</string>
   <string name="title_activity_recycler_view">RecyclerViewActivity</string>
+  <string name="title_activity_linear_layout">LinearLayoutActivity</string>
 </resources>

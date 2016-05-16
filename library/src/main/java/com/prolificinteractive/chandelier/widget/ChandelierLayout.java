@@ -8,7 +8,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.MotionEventCompat;
 import android.support.v4.view.ScrollingView;
 import android.support.v4.view.ViewCompat;
-import android.support.v4.widget.NestedScrollView;
 import android.support.v7.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -21,6 +20,7 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
 import android.widget.AbsListView;
+import android.widget.ScrollView;
 import com.prolificinteractive.chandelier.R;
 import java.util.List;
 
@@ -149,9 +149,12 @@ public class ChandelierLayout extends ViewGroup {
     }
 
     if (absListView == null) {
+      if (getChildCount() > 2) {
+        throw new IllegalStateException("ChandelierLayout can host only one direct child");
+      }
       for (int i = 0; i < getChildCount(); i++) {
         final View child = getChildAt(i);
-        if (child instanceof ScrollingView || child instanceof NestedScrollView) {
+        if (child instanceof ScrollingView || child instanceof ScrollView) {
           // TODO fix validation
           absListView = child;
           scrollListener.setParent(absListView);
