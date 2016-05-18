@@ -49,7 +49,7 @@ XML attributes:
 
 - `ai_margin` Set action item margin
 
-Mare sure to check sample for more examples.
+Make sure to check sample for more examples.
 
 Contributing
 ============
