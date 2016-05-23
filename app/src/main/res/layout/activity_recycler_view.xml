@@ -10,13 +10,13 @@
 
   <include layout="@layout/include_toolbar" />
 
-  <com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout
-      android:id="@+id/swipe_action_layout"
+  <com.prolificinteractive.chandelier.widget.ChandelierLayout
+      android:id="@+id/chandelier_layout"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:layout_below="@id/toolbar"
-      app:al_background="?attr/colorPrimary"
+      app:chandelier_background="?attr/colorPrimary"
       >
     <include layout="@layout/content_recycler_view" />
-  </com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout>
+  </com.prolificinteractive.chandelier.widget.ChandelierLayout>
 </RelativeLayout>

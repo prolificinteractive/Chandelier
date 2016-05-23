@@ -1,4 +1,4 @@
-package com.prolificinteractive.swipeactionlayout.widget;
+package com.prolificinteractive.chandelier.widget;
 
 import android.view.animation.Animation;
 

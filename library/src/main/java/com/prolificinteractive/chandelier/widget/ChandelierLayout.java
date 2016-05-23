@@ -1,4 +1,4 @@
-package com.prolificinteractive.swipeactionlayout.widget;
+package com.prolificinteractive.chandelier.widget;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -21,11 +21,11 @@ import android.view.animation.Animation.AnimationListener;
 import android.view.animation.DecelerateInterpolator;
 import android.view.animation.Transformation;
 import android.widget.AbsListView;
-import com.prolificinteractive.swipeactionlayout.R;
+import com.prolificinteractive.chandelier.R;
 import java.util.List;
 
-public class SwipeActionLayout extends ViewGroup {
-  private static final String LOG_TAG = SwipeActionLayout.class.getSimpleName();
+public class ChandelierLayout extends ViewGroup {
+  private static final String LOG_TAG = ChandelierLayout.class.getSimpleName();
 
   private static final float DECELERATE_INTERPOLATION_FACTOR = 2f;
   private static final int INVALID_POINTER = -1;
@@ -58,15 +58,15 @@ public class SwipeActionLayout extends ViewGroup {
   // refresh was triggered.
   private boolean isReturningToStart;
   private int animateToStartDuration;
-  private ActionLayout actionLayout;
+  private OrnamentLayout ornamentLayout;
   private float spinnerFinalOffset;
   private IdleScrollListener scrollListener = new IdleScrollListener();
 
   private final AnimationListener moveToStartListener = new SimpleAnimationListener() {
     @Override public void onAnimationEnd(Animation animation) {
       if (actionSelected) {
-        int selectedIndex = actionLayout.getSelectedIndex();
-        listener.onActionSelected(selectedIndex, actionLayout.getActionItem(selectedIndex));
+        int selectedIndex = ornamentLayout.getSelectedIndex();
+        listener.onActionSelected(selectedIndex, ornamentLayout.getActionItem(selectedIndex));
         actionSelected = false;
       }
     }
@@ -83,14 +83,14 @@ public class SwipeActionLayout extends ViewGroup {
   /**
    * Simple constructor to use when creating a SwipeRefreshLayout from code.
    */
-  public SwipeActionLayout(Context context) {
+  public ChandelierLayout(Context context) {
     this(context, null);
   }
 
   /**
    * Constructor that is called when inflating SwipeRefreshLayout from XML.
    */
-  public SwipeActionLayout(Context context, AttributeSet attrs) {
+  public ChandelierLayout(Context context, AttributeSet attrs) {
     super(context, attrs);
     this.attrs = attrs;
 
@@ -108,11 +108,11 @@ public class SwipeActionLayout extends ViewGroup {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       setElevation(
-          a.getDimensionPixelSize(R.styleable.SwipeActionLayout_al_elevation, defaultElevation));
+          a.getDimensionPixelSize(R.styleable.ChandelierLayout_chandelier_elevation, defaultElevation));
     }
 
     animateToStartDuration =
-        a.getInteger(R.styleable.SwipeActionLayout_al_animate_to_start_duration,
+        a.getInteger(R.styleable.ChandelierLayout_chandelier_animate_to_start_duration,
             ANIMATE_TO_START_DURATION);
 
     a.recycle();
@@ -122,9 +122,9 @@ public class SwipeActionLayout extends ViewGroup {
   }
 
   private void createProgressView() {
-    actionLayout = new ActionLayout(getContext(), attrs);
-    actionLayout.setVisibility(View.GONE);
-    addView(actionLayout);
+    ornamentLayout = new OrnamentLayout(getContext(), attrs);
+    ornamentLayout.setVisibility(View.GONE);
+    addView(ornamentLayout);
   }
 
   /**
@@ -141,7 +141,7 @@ public class SwipeActionLayout extends ViewGroup {
     if (target == null) {
       for (int i = 0; i < getChildCount(); i++) {
         View child = getChildAt(i);
-        if (!child.equals(actionLayout)) {
+        if (!child.equals(ornamentLayout)) {
           target = child;
           break;
         }
@@ -194,8 +194,8 @@ public class SwipeActionLayout extends ViewGroup {
     final int childWidth = width - getPaddingLeft() - getPaddingRight();
     final int childHeight = height - getPaddingTop() - getPaddingBottom();
     child.layout(childLeft, childTop, childLeft + childWidth, childTop + childHeight);
-    actionLayout.layout(0, currentTargetOffsetTop,
-        width, currentTargetOffsetTop + actionLayout.getMeasuredHeight());
+    ornamentLayout.layout(0, currentTargetOffsetTop,
+        width, currentTargetOffsetTop + ornamentLayout.getMeasuredHeight());
   }
 
   @Override
@@ -218,16 +218,16 @@ public class SwipeActionLayout extends ViewGroup {
             MeasureSpec.EXACTLY
         ));
 
-    actionLayout.measure(
+    ornamentLayout.measure(
         MeasureSpec.makeMeasureSpec(getWidth(), MeasureSpec.EXACTLY),
-        actionLayout.getMeasuredHeight()
+        ornamentLayout.getMeasuredHeight()
     );
 
     if (!originalOffsetCalculated) {
       originalOffsetCalculated = true;
-      spinnerFinalOffset = actionLayout.getMeasuredHeight();
+      spinnerFinalOffset = ornamentLayout.getMeasuredHeight();
       totalDragDistance = spinnerFinalOffset;
-      currentTargetOffsetTop = originalOffsetTop = -actionLayout.getMeasuredHeight();
+      currentTargetOffsetTop = originalOffsetTop = -ornamentLayout.getMeasuredHeight();
     }
   }
 
@@ -267,7 +267,7 @@ public class SwipeActionLayout extends ViewGroup {
 
     switch (action) {
       case MotionEvent.ACTION_DOWN:
-        setTargetOffsetTopAndBottom(originalOffsetTop - actionLayout.getTop());
+        setTargetOffsetTopAndBottom(originalOffsetTop - ornamentLayout.getTop());
         activePointerId = MotionEventCompat.getPointerId(ev, 0);
         isBeingDragged = false;
         final float initialDownY = getMotionEventY(ev, activePointerId);
@@ -334,17 +334,17 @@ public class SwipeActionLayout extends ViewGroup {
     final float dragPercent = Math.min(1f, Math.abs(originalDragPercent));
     final int targetY = originalOffsetTop + (int) (spinnerFinalOffset * dragPercent);
 
-    if (actionLayout.getVisibility() != View.VISIBLE) {
-      actionLayout.setVisibility(View.VISIBLE);
+    if (ornamentLayout.getVisibility() != View.VISIBLE) {
+      ornamentLayout.setVisibility(View.VISIBLE);
     }
     setTargetOffsetTopAndBottom(targetY - currentTargetOffsetTop);
-    actionLayout.onLayoutTranslated(1 - (float) targetY / currentTargetOffsetTop);
+    ornamentLayout.onLayoutTranslated(1 - (float) targetY / currentTargetOffsetTop);
   }
 
   private void finishAction(final float overscrollTop) {
     actionSelected = overscrollTop > totalDragDistance;
     if (actionSelected) {
-      actionLayout.finishAction(new SimpleAnimationListener() {
+      ornamentLayout.finishAction(new SimpleAnimationListener() {
         @Override public void onAnimationEnd(Animation animation) {
           animateOffsetToStartPosition();
         }
@@ -370,8 +370,8 @@ public class SwipeActionLayout extends ViewGroup {
     if (!isEnabled() || isReturningToStart || canChildScrollUp() || (!scrollListener.isIdle()
         && !isShowingAction)) {
       // Fail fast if we're not in a state where a swipe is possible
-      if (actionLayout != null && isShowingAction) {
-        actionLayout.onParentTouchEvent(ev);
+      if (ornamentLayout != null && isShowingAction) {
+        ornamentLayout.onParentTouchEvent(ev);
       }
       return false;
     }
@@ -429,21 +429,21 @@ public class SwipeActionLayout extends ViewGroup {
       }
     }
 
-    if (actionLayout != null) {
-      actionLayout.onParentTouchEvent(ev);
+    if (ornamentLayout != null) {
+      ornamentLayout.onParentTouchEvent(ev);
     }
 
     return true;
   }
 
   private void animateOffsetToStartPosition() {
-    from = Math.round(ViewCompat.getTranslationY(actionLayout));
+    from = Math.round(ViewCompat.getTranslationY(ornamentLayout));
     animateToStartPosition.reset();
     animateToStartPosition.setDuration(animateToStartDuration);
     animateToStartPosition.setInterpolator(decelerateInterpolator);
     animateToStartPosition.setAnimationListener(moveToStartListener);
-    actionLayout.clearAnimation();
-    actionLayout.startAnimation(animateToStartPosition);
+    ornamentLayout.clearAnimation();
+    ornamentLayout.startAnimation(animateToStartPosition);
   }
 
   private void moveToStart(float interpolatedTime) {
@@ -451,9 +451,9 @@ public class SwipeActionLayout extends ViewGroup {
   }
 
   private void setTargetOffsetTopAndBottom(final int offset) {
-    ViewCompat.setTranslationY(actionLayout, offset);
+    ViewCompat.setTranslationY(ornamentLayout, offset);
     ViewCompat.setTranslationY(absListView, offset);
-    currentTargetOffsetTop = actionLayout.getTop();
+    currentTargetOffsetTop = ornamentLayout.getTop();
   }
 
   private void onSecondaryPointerUp(MotionEvent ev) {
@@ -468,16 +468,16 @@ public class SwipeActionLayout extends ViewGroup {
   }
 
   /**
-   * Add a list of actions to the {@link SwipeActionLayout}.
+   * Add a list of actions to the {@link ChandelierLayout}.
    *
-   * @param items list of {@link ActionItem} to display
+   * @param items list of {@link Ornament} to display
    */
-  public void populateActionItems(@Nullable final List<? extends ActionItem> items) {
-    actionLayout.populateActionItems(items);
+  public void populateActionItems(@Nullable final List<? extends Ornament> items) {
+    ornamentLayout.populateActionItems(items);
   }
 
   /**
-   * Show the actions of the {@link SwipeActionLayout}
+   * Show the actions of the {@link ChandelierLayout}
    */
   public void showActions() {
     isShowingAction = true;
@@ -492,11 +492,11 @@ public class SwipeActionLayout extends ViewGroup {
   }
 
   /**
-   * Hide the actions of the {@link SwipeActionLayout}
+   * Hide the actions of the {@link ChandelierLayout}
    */
   public void hideActions() {
     isShowingAction = false;
-    final float top = ViewCompat.getTranslationY(actionLayout);
+    final float top = ViewCompat.getTranslationY(ornamentLayout);
     final Animation hideAnimation = new Animation() {
       @Override protected void applyTransformation(float interpolatedTime, Transformation t) {
         moveActionLayout((1 - interpolatedTime) * top);
@@ -509,7 +509,7 @@ public class SwipeActionLayout extends ViewGroup {
 
   /**
    * Set the duration that the layout takes to get into its original position. Default is
-   * {@link SwipeActionLayout#ANIMATE_TO_START_DURATION} = 300 millisecond.
+   * {@link ChandelierLayout#ANIMATE_TO_START_DURATION} = 300 millisecond.
    *
    * @param duration in millisecond
    */
@@ -522,6 +522,6 @@ public class SwipeActionLayout extends ViewGroup {
    * triggers an action should implement this interface.
    */
   public interface OnActionListener {
-    void onActionSelected(int index, ActionItem action);
+    void onActionSelected(int index, Ornament action);
   }
 }

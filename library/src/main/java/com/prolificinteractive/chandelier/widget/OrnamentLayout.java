@@ -1,4 +1,4 @@
-package com.prolificinteractive.swipeactionlayout.widget;
+package com.prolificinteractive.chandelier.widget;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -17,7 +17,7 @@ import android.view.animation.Transformation;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import com.prolificinteractive.swipeactionlayout.R;
+import com.prolificinteractive.chandelier.R;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,7 +26,7 @@ import static android.view.Gravity.CENTER_VERTICAL;
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 import static android.view.ViewGroup.LayoutParams.WRAP_CONTENT;
 
-public class ActionLayout extends FrameLayout {
+public class OrnamentLayout extends FrameLayout {
 
   private static final int ITEM_WEIGHT = 1;
   private static final AccelerateInterpolator ACCELERATE_INTERPOLATOR =
@@ -40,7 +40,7 @@ public class ActionLayout extends FrameLayout {
 
   private final LinearLayout container;
   private final ImageView selectedImageView;
-  private final List<ActionItem> actionItems = new ArrayList<>();
+  private final List<Ornament> ornaments = new ArrayList<>();
   private final List<ImageView> imageViews = new ArrayList<>();
   private final int actionItemLayoutHeight;
   private final int actionItemLayoutWidth;
@@ -67,12 +67,12 @@ public class ActionLayout extends FrameLayout {
     }
   };
 
-  public ActionLayout(final Context context, final AttributeSet attrs) {
+  public OrnamentLayout(final Context context, final AttributeSet attrs) {
     super(context);
     final Resources res = getResources();
     final TypedArray a = context.getTheme().obtainStyledAttributes(
         attrs,
-        R.styleable.SwipeActionLayout,
+        R.styleable.ChandelierLayout,
         0, 0);
 
     // Defaults
@@ -81,22 +81,22 @@ public class ActionLayout extends FrameLayout {
     final int defaultSelectorSize = res.getDimensionPixelSize(R.dimen.default_selector_size);
     final boolean defaultScaleEnabled = res.getBoolean(R.bool.default_scale_enabled);
 
-    isScaleEnabled = a.getBoolean(R.styleable.SwipeActionLayout_al_scale_enabled,
+    isScaleEnabled = a.getBoolean(R.styleable.ChandelierLayout_chandelier_scale_enabled,
         defaultScaleEnabled);
     actionItemLayoutHeight =
-        a.getDimensionPixelSize(R.styleable.SwipeActionLayout_ai_layout_height,
+        a.getDimensionPixelSize(R.styleable.ChandelierLayout_ornament_layout_height,
             WRAP_CONTENT);
-    actionItemLayoutWidth = a.getDimensionPixelSize(R.styleable.SwipeActionLayout_ai_layout_width,
+    actionItemLayoutWidth = a.getDimensionPixelSize(R.styleable.ChandelierLayout_ornament_layout_width,
         WRAP_CONTENT);
 
     // Action Layout
     container = new LinearLayout(context);
     container.setLayoutParams(new LayoutParams(MATCH_PARENT, WRAP_CONTENT, CENTER_VERTICAL));
-    setBackground(a.getDrawable(R.styleable.SwipeActionLayout_al_background));
+    setBackground(a.getDrawable(R.styleable.ChandelierLayout_chandelier_background));
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       setElevation(
-          a.getDimensionPixelSize(R.styleable.SwipeActionLayout_al_elevation, defaultElevation));
+          a.getDimensionPixelSize(R.styleable.ChandelierLayout_chandelier_elevation, defaultElevation));
     }
 
     container.setOrientation(LinearLayout.HORIZONTAL);
@@ -104,22 +104,22 @@ public class ActionLayout extends FrameLayout {
 
     // Action Item
     imageViewMargin =
-        a.getDimensionPixelSize(R.styleable.SwipeActionLayout_ai_margin, defaultSelectorMargin);
-    selectedSize = a.getDimensionPixelSize(R.styleable.SwipeActionLayout_al_selected_size,
+        a.getDimensionPixelSize(R.styleable.ChandelierLayout_ornament_margin, defaultSelectorMargin);
+    selectedSize = a.getDimensionPixelSize(R.styleable.ChandelierLayout_chandelier_selected_size,
         defaultSelectorSize);
     selectedImageView = new ImageView(context);
     final LayoutParams selectedLp = new LayoutParams(selectedSize, selectedSize, CENTER_VERTICAL);
     selectedLp.setMargins(0, imageViewMargin, 0, imageViewMargin);
     selectedImageView.setLayoutParams(selectedLp);
 
-    Drawable selectorBackground = a.getDrawable(R.styleable.SwipeActionLayout_al_selector);
+    Drawable selectorBackground = a.getDrawable(R.styleable.ChandelierLayout_chandelier_selector);
     if (selectorBackground != null) {
       selectedImageView.setBackground(selectorBackground);
     } else {
       selectedImageView.setBackground(res.getDrawable(R.drawable.default_selector));
     }
 
-    Drawable layoutBackground = a.getDrawable(R.styleable.SwipeActionLayout_al_background);
+    Drawable layoutBackground = a.getDrawable(R.styleable.ChandelierLayout_chandelier_background);
     if (layoutBackground != null) {
       setBackground(layoutBackground);
     } else {
@@ -135,22 +135,22 @@ public class ActionLayout extends FrameLayout {
   }
 
   public void populateActionItems(int... drawablesResIds) {
-    final ArrayList<ActionItem> items = new ArrayList<>();
+    final ArrayList<Ornament> items = new ArrayList<>();
     for (int resId : drawablesResIds) {
-      items.add(new ActionItem(resId));
+      items.add(new Ornament(resId));
     }
     populateActionItems(items);
   }
 
-  public void populateActionItems(@Nullable final List<? extends ActionItem> items) {
+  public void populateActionItems(@Nullable final List<? extends Ornament> items) {
     container.removeAllViews();
-    actionItems.clear();
+    ornaments.clear();
     imageViews.clear();
 
     if (items != null) {
-      actionItems.addAll(items);
+      ornaments.addAll(items);
       final Context context = getContext();
-      for (final ActionItem item : items) {
+      for (final Ornament item : items) {
         final FrameLayout frame = new FrameLayout(context);
         frame.setLayoutParams(new LinearLayout.LayoutParams(
             MATCH_PARENT,
@@ -173,7 +173,7 @@ public class ActionLayout extends FrameLayout {
         frame.addView(imageView);
         container.addView(frame);
       }
-      selectedIndex = actionItems.size() / 2;
+      selectedIndex = ornaments.size() / 2;
       imageViews.get(selectedIndex).setSelected(true);
     }
   }
@@ -189,7 +189,7 @@ public class ActionLayout extends FrameLayout {
     }
 
     final float x = ev.getX();
-    final int count = actionItems.size();
+    final int count = ornaments.size();
 
     // One quarter of the screen width
     final int q = measuredWidth / 4;
@@ -274,7 +274,7 @@ public class ActionLayout extends FrameLayout {
     selectedIndex = newSelectedIndex;
     isAnimating = true;
 
-    final int iW = measuredWidth / actionItems.size();
+    final int iW = measuredWidth / ornaments.size();
     final int target = iW * selectedIndex + (iW - selectedSize) / 2;
     final float currentScale = selectedImageView.getScaleX();
     final float currentTranslation = selectedImageView.getTranslationX();
@@ -315,7 +315,7 @@ public class ActionLayout extends FrameLayout {
 
   }
 
-  public ActionItem getActionItem(int index) {
-    return actionItems.get(index);
+  public Ornament getActionItem(int index) {
+    return ornaments.get(index);
   }
 }
