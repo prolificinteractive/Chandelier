@@ -1,5 +1,6 @@
 Chandelier
 ==========
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Chandelier-blue.svg?style=true)](https://android-arsenal.com/details/1/3598) [![Maven Central](https://img.shields.io/maven-central/v/com.prolificinteractive/swipe-action-layout.svg?maxAge=2592000)](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22swipe-action-layout%22) [![Travis](https://img.shields.io/travis/prolificinteractive/swipe-action-layout.svg?maxAge=2592000)](https://travis-ci.org/prolificinteractive/swipe-action-layout)
 
 A nice swipe layout that provides new actions with a material design look and feel.
 
