@@ -1,3 +1,5 @@
+<img src="/images/hero.jpg"/>
+
 Chandelier
 ==========
 
