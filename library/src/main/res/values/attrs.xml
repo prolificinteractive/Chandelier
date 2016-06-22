@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <declare-styleable name="SwipeActionLayout">
+  <declare-styleable name="ChandelierLayout">
     <!-- Action Layout -->
-    <attr name="al_background" format="reference" />
-    <attr name="al_elevation" format="dimension" />
-    <attr name="al_selector" format="reference" />
-    <attr name="al_selected_size" format="dimension" />
-    <attr name="al_scale_enabled" format="boolean" />
-    <attr name="al_animate_to_start_duration" format="integer" />
+    <attr name="chandelier_background" format="reference" />
+    <attr name="chandelier_elevation" format="dimension" />
+    <attr name="chandelier_selector" format="reference" />
+    <attr name="chandelier_selected_size" format="dimension" />
+    <attr name="chandelier_scale_enabled" format="boolean" />
+    <attr name="chandelier_animate_to_start_duration" format="integer" />
 
     <!-- Action Item -->
-    <attr name="ai_margin" format="dimension" />
-    <attr name="ai_layout_height" format="dimension" />
-    <attr name="ai_layout_width" format="dimension" />
+    <attr name="ornament_margin" format="dimension" />
+    <attr name="ornament_layout_height" format="dimension" />
+    <attr name="ornament_layout_width" format="dimension" />
   </declare-styleable>
 </resources>

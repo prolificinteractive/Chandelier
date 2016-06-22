@@ -1,6 +1,7 @@
 <resources>
-    <string name="app_name">SwipeActionLayout</string>
-    <string name="action_settings">Settings</string>
+  <string name="app_name">Chandelier</string>
+  <string name="action_settings">Settings</string>
+
   <string name="title_activity_web_view">WebViewActivity</string>
   <string name="title_activity_recycler_view">RecyclerViewActivity</string>
 </resources>

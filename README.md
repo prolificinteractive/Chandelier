@@ -1,5 +1,8 @@
-Swipe Action Layout [![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-swipe--action--layout-blue.svg?style=true)](https://android-arsenal.com/details/1/3598)
-===================
+<img src="/images/hero.jpg"/>
+
+Chandelier
+==========
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-Chandelier-blue.svg?style=true)](https://android-arsenal.com/details/1/3598) [![Maven Central](https://img.shields.io/maven-central/v/com.prolificinteractive/swipe-action-layout.svg?maxAge=2592000)](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22swipe-action-layout%22) [![Travis](https://img.shields.io/travis/prolificinteractive/swipe-action-layout.svg?maxAge=2592000)](https://travis-ci.org/prolificinteractive/swipe-action-layout)
 
 A nice swipe layout that provides new actions with a material design look and feel.
 
@@ -10,22 +13,22 @@ Usage
 -----
 
 1. Add `compile 'com.prolificinteractive:swipe-action-layout:0.0.1'` to your dependencies.
-2. Wrap your list around `SwipeActionLayout` in your layouts or view hierarchy.
-3. Add a list of `ActionItem` using `SwipeActionLayout#populateActionItems()` method.
+2. Wrap your list around `ChandelierLayout` in your layouts or view hierarchy.
+3. Add a list of `ActionItem` using `ChandelierLayout#populateActionItems()` method.
 4. Set a `OnActionSelectedListener` to listen for selected action and update the view accordingly.
 
 Or
 
 1. Add `compile 'com.prolificinteractive:swipe-action-layout:0.0.1'` to your dependencies.
-2. Wrap your list around `SwipeActionLayout` in your layouts or view hierarchy.
-3. Create Objects that extend `ActionItem` and add them using `SwipeActionLayout#populateActionItems()` method.
+2. Wrap your list around `ChandelierLayout` in your layouts or view hierarchy.
+3. Create Objects that extend `ActionItem` and add them using `ChandelierLayout#populateActionItems()` method.
 4. Override `ActionItem#Execute()` method to execute the action when selected.
 
 Example:
 
 ```xml
-  <com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout
-      android:id="@+id/swipe_action_layout"
+  <com.prolificinteractive.chandelier.widget.ChandelierLayout
+      android:id="@+id/chandelier_layout"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       app:al_background="?attr/colorPrimary"
@@ -34,7 +37,7 @@ Example:
       <!-- Insert your list here -->
       <include layout="@layout/example_recycler_view" />
   
-  </com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout>
+  </com.prolificinteractive.chandelier.widget.ChandelierLayout>
 ```
 
 Customization
@@ -58,7 +61,7 @@ Would you like to contribute? Fork us and send a pull request! Be sure to checko
 
 ## License
 
-Swipe Action Layout is Copyright (c) 2016 Prolific Interactive. It may be redistributed under the terms specified in the [LICENSE] file.
+Chandelier is Copyright (c) 2016 Prolific Interactive. It may be redistributed under the terms specified in the [LICENSE] file.
 
 [LICENSE]: /LICENSE
 
@@ -66,4 +69,4 @@ Swipe Action Layout is Copyright (c) 2016 Prolific Interactive. It may be redist
 
 ![prolific](https://s3.amazonaws.com/prolificsitestaging/logos/Prolific_Logo_Full_Color.png)
 
-Swipe Action Layout is maintained and funded by Prolific Interactive. The names and logos are trademarks of Prolific Interactive.
+Chandelier is maintained and funded by Prolific Interactive. The names and logos are trademarks of Prolific Interactive.

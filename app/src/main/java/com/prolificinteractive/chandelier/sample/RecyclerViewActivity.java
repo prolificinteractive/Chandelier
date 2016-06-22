@@ -1,4 +1,4 @@
-package com.prolificinteractive.swipeactionlayout.sample;
+package com.prolificinteractive.chandelier.sample;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,13 +12,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.prolificinteractive.swipeactionlayout.widget.ActionItem;
-import com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout;
+import com.prolificinteractive.chandelier.widget.Ornament;
+import com.prolificinteractive.chandelier.widget.ChandelierLayout;
 import java.util.Arrays;
 
 public class RecyclerViewActivity extends AppCompatActivity {
 
-  private SwipeActionLayout swipeActionLayout;
+  private ChandelierLayout chandelierLayout;
   private RecyclerView list;
   private DummyAdapter adapter;
 
@@ -31,9 +31,9 @@ public class RecyclerViewActivity extends AppCompatActivity {
     final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 
-    swipeActionLayout = (SwipeActionLayout) findViewById(R.id.swipe_action_layout);
-    swipeActionLayout.setOnActionSelectedListener(new SwipeActionLayout.OnActionListener() {
-      @Override public void onActionSelected(int index, ActionItem action) {
+    chandelierLayout = (ChandelierLayout) findViewById(R.id.chandelier_layout);
+    chandelierLayout.setOnActionSelectedListener(new ChandelierLayout.OnActionListener() {
+      @Override public void onActionSelected(int index, Ornament action) {
         Toast.makeText(RecyclerViewActivity.this, String.format("%d", index), Toast.LENGTH_SHORT)
             .show();
       }
@@ -44,10 +44,10 @@ public class RecyclerViewActivity extends AppCompatActivity {
     list.setLayoutManager(new LinearLayoutManager(this));
     list.setAdapter(adapter);
 
-    swipeActionLayout.populateActionItems(Arrays.asList(
-        new ActionItem(R.drawable.ic_close),
-        new ActionItem(R.drawable.ic_add),
-        new ActionItem(R.drawable.ic_check)
+    chandelierLayout.populateActionItems(Arrays.asList(
+        new Ornament(R.drawable.ic_close),
+        new Ornament(R.drawable.ic_add),
+        new Ornament(R.drawable.ic_check)
     ));
   }
 
@@ -97,7 +97,7 @@ public class RecyclerViewActivity extends AppCompatActivity {
     }
 
     @Override public boolean onLongClick(View v) {
-      swipeActionLayout.showActions();
+      chandelierLayout.showActions();
       return true;
     }
   }

@@ -6,52 +6,56 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.prolificinteractive.swipeactionlayout.sample.WebViewActivity">
+    tools:context="com.prolificinteractive.chandelier.sample.WebViewActivity"
+    >
 
   <android.support.design.widget.AppBarLayout
-      android:layout_height="wrap_content"
       android:layout_width="match_parent"
-      android:theme="@style/AppTheme.AppBarOverlay">
+      android:layout_height="wrap_content"
+      android:theme="@style/AppTheme.AppBarOverlay"
+      >
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        app:popupTheme="@style/AppTheme.PopupOverlay"/>
+        app:popupTheme="@style/AppTheme.PopupOverlay"
+        />
 
   </android.support.design.widget.AppBarLayout>
-    <com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout
-        android:id="@+id/swipe_action_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:al_selected_size="40dp"
-        app:al_selector="@drawable/al_github_selector"
-        >
-        <android.support.v4.widget.NestedScrollView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            >
-            <include layout="@layout/content_web_view"/>
-        </android.support.v4.widget.NestedScrollView>
-    </com.prolificinteractive.swipeactionlayout.widget.SwipeActionLayout>
-
-    <ProgressBar
-        android:id="@+id/progress_bar"
-        android:layout_width="match_parent"
+  <com.prolificinteractive.chandelier.widget.ChandelierLayout
+      android:id="@+id/chandelier_layout"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      app:chandelier_selected_size="40dp"
+      app:chandelier_selector="@drawable/al_github_selector"
+      app:layout_behavior="@string/appbar_scrolling_view_behavior"
+      >
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-        android:layout_marginTop="-7dp"
-        android:elevation="4dp"
-        android:max="100"
-        />
+        >
+      <include layout="@layout/content_web_view"/>
+    </android.support.v4.widget.NestedScrollView>
+  </com.prolificinteractive.chandelier.widget.ChandelierLayout>
+
+  <ProgressBar
+      android:id="@+id/progress_bar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="-7dp"
+      android:elevation="4dp"
+      android:max="100"
+      style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+      />
   <android.support.design.widget.FloatingActionButton
       android:id="@+id/fab"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_gravity="bottom|end"
       android:layout_margin="@dimen/fab_margin"
-      android:src="@drawable/ic_search"/>
+      android:src="@drawable/ic_search"
+      />
 
 </android.support.design.widget.CoordinatorLayout>
