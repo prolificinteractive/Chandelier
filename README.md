@@ -9,20 +9,40 @@ A nice swipe layout that provides new actions with a material design look and fe
 <img src="/images/demo1.gif" alt="Demo Screen Capture" width="300px" />
 <img src="/images/demo2.gif" alt="Demo Screen Capture" width="300px" />
 
+## Installation
+
+Step 1. Add the JitPack repository to your build file
+
+```groovy
+allprojects {
+  repositories {
+    ...
+    maven { url 'https://jitpack.io' }
+  }
+}
+```
+
+Step 2. Add the dependency
+
+```groovy
+dependencies {
+  implementation 'com.github.prolificinteractive:chandelier:${chandelierVersion}'
+}
+```
+
+
 Usage
 -----
 
-1. Add `compile 'com.prolificinteractive:chandelier:0.1.0'` to your dependencies.
-2. Wrap your list around `ChandelierLayout` in your layouts or view hierarchy.
-3. Add a list of `ActionItem` using `ChandelierLayout#populateActionItems()` method.
-4. Set a `OnActionSelectedListener` to listen for selected action and update the view accordingly.
+1. Wrap your list around `ChandelierLayout` in your layouts or view hierarchy.
+2. Add a list of `ActionItem` using `ChandelierLayout#populateActionItems()` method.
+3. Set a `OnActionSelectedListener` to listen for selected action and update the view accordingly.
 
 Or
 
-1. Add `compile 'com.prolificinteractive:chandelier:0.1.0'` to your dependencies.
-2. Wrap your list around `ChandelierLayout` in your layouts or view hierarchy.
-3. Create Objects that extend `ActionItem` and add them using `ChandelierLayout#populateActionItems()` method.
-4. Override `ActionItem#Execute()` method to execute the action when selected.
+1 Wrap your list around `ChandelierLayout` in your layouts or view hierarchy.
+2. Create Objects that extend `ActionItem` and add them using `ChandelierLayout#populateActionItems()` method.
+3. Override `ActionItem#Execute()` method to execute the action when selected.
 
 Example:
 
@@ -61,7 +81,7 @@ Would you like to contribute? Fork us and send a pull request! Be sure to checko
 
 ## License
 
-Chandelier is Copyright (c) 2017 Prolific Interactive. It may be redistributed under the terms specified in the [LICENSE] file.
+Chandelier is Copyright (c) 2018 Prolific Interactive. It may be redistributed under the terms specified in the [LICENSE] file.
 
 [LICENSE]: /LICENSE
 
