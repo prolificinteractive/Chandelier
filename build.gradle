@@ -1,26 +1,29 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0'
-        classpath 'com.github.dcendents:android-maven-plugin:1.2'
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
-    }
+  repositories {
+    google()
+    jcenter()
+  }
+  dependencies {
+    classpath 'com.android.tools.build:gradle:3.1.2'
+    classpath 'com.github.dcendents:android-maven-gradle-plugin:2.0'
+  }
 }
 
 allprojects {
-    repositories {
-        jcenter()
-        // Here for convience when testing new releases
-        //maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
-    }
-    // Is Release Build?
-    ext.isReleaseVersion = has("release")
-    ext.versionCodeInt = getProperty('VERSION_CODE').toInteger()
-    version = VERSION_NAME
+  repositories {
+    google()
+    jcenter()
+    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+  }
+}
+
+task clean(type: Delete) {
+  delete rootProject.buildDir
+}
+
+ext {
+  versionName = "0.1.0"
+  versionCode = 1
 }

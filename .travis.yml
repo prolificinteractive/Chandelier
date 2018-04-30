@@ -7,19 +7,30 @@ android:
   components:
     - tools
     - platform-tools
-    - build-tools-23.0.3
-    - android-23
-    - extra-android-m2repository
+    - build-tools-27.0.3
+    - android-27
     - extra-google-m2repository
+    - extra-android-m2repository
+  licenses:
+    - 'android-sdk-license-.+'
+    - 'google-gdk-license-.+'
+
+before_install:
+  - echo yes | sdkmanager "platforms;android-27"
+
+before_install:
+- yes | sdkmanager "platforms;android-27"
 
 script:
-  - ./gradlew clean check assemble -Dpre-dex=false
+  - ./gradlew clean build -PdisablePreDex --stacktrace --console plain
 
-notifications:
-  email: false
-
-sudo: false
-
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
 cache:
   directories:
-    - $HOME/.gradle
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
+
+sudo: false
